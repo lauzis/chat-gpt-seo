@@ -33,22 +33,18 @@ if (!defined('CHAT_GPT_SEO_UPLOAD_URL')) {
 }
 
 
-
-
 require(CHAT_GPT_SEO_PLUGIN_DIR . '/classes/ChatGptSeoHelpers.php');
 require(CHAT_GPT_SEO_PLUGIN_DIR . '/classes/ChatGptSeoApi.php');
 require(CHAT_GPT_SEO_PLUGIN_DIR . '/classes/ChatGptSeo.php');
 require(CHAT_GPT_SEO_PLUGIN_DIR . '/classes/ChatBot.php');
 
-
-add_action('init', 'CHAT_GPT_SEO_init');
-function CHAT_GPT_SEO_init()
+function CHAT_GPT_SEO_init():void
 {
-
     $chatGptSeo = new \ChatGptSeo\ChatGptSeo();
     $chatGptSeo->init();
-
 }
+
+add_action('init', 'CHAT_GPT_SEO_init');
 
 
 

@@ -10,7 +10,7 @@ const LimeResyncThreshold = (60 * 30);
 
 class ChatGptSeo
 {
-    public function init()
+    public function init():void
     {
         if (is_admin()) {
             $this->add_options_page();
@@ -21,7 +21,8 @@ class ChatGptSeo
         $this->setup_api_routes();
     }
 
-    public function setup_api_routes(){
+    public function setup_api_routes():void
+    {
 
         add_action( 'rest_api_init', function () {
             register_rest_route( 'chat-gpt-seo/v1', '/audit-item/(?P<id>\d+)', array(
@@ -76,7 +77,7 @@ class ChatGptSeo
         } );
     }
 
-    public function cron_add_timing($schedules)
+    public function cron_add_timing($schedules):array
     {
         if (!isset($schedules["5min"])) {
             $schedules["5min"] = array(
@@ -86,7 +87,7 @@ class ChatGptSeo
         return $schedules;
     }
 
-    private function setup_cron()
+    private function setup_cron():void
     {
 
         if (isset($_GET['run_cron_user_group'])) {
@@ -103,7 +104,7 @@ class ChatGptSeo
     }
 
 
-    private function setup_hooks()
+    private function setup_hooks():void
     {
         // action hook
         add_action('wp_login', [$this, 'handle_user_login'], 100, 2);
@@ -113,7 +114,7 @@ class ChatGptSeo
         add_action("wp_ajax_nopriv_update_company_customer_number", [$this, 'ajax_update_customer_number']);
     }
 
-    public function add_chat_gpt_seo_log_page()
+    public function add_chat_gpt_seo_log_page():void
     {
         add_submenu_page(
             'tools.php',
@@ -125,14 +126,14 @@ class ChatGptSeo
         );
     }
 
-    public function check_user_meta_for_missing_user_group()
+    public function check_user_meta_for_missing_user_group():void
     {
         //TODO
     }
 
 
 
-    public function log_page_callback()
+    public function log_page_callback():void
     {
 
         ?>
@@ -145,7 +146,7 @@ class ChatGptSeo
 
 
 
-    private function add_options_page()
+    private function add_options_page():void
     {
         if (function_exists('acf_add_options_page')) {
 
@@ -175,7 +176,7 @@ class ChatGptSeo
         }
     }
 
-    private function get_api_settings()
+    private function get_api_settings():array
     {
         $test_mode = get_field('chat_gpt_seo_test_mode', 'option');
         $token = get_field('chat_gpt_seo_test_token', 'option');
@@ -191,7 +192,8 @@ class ChatGptSeo
 
 
 
-    function log($text){
+    function log($text):void
+    {
         $logger = new ChatGptSeoLog();
         $log_data = [
             'timestamp' => time(),
