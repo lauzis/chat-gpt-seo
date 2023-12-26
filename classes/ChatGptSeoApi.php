@@ -5,7 +5,7 @@ namespace ChatGptSeo;
 class ChatGptSeoApi
 {
 
-    private function get_api_settings()
+    private function get_api_settings():array
     {
         $test_mode = get_field('chat_gpt_seo_test_mode', 'option');
         $token = get_field('chat_gpt_seo_test_token', 'option');;
