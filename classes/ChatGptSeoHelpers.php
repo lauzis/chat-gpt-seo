@@ -53,14 +53,23 @@ class ChatGptSeoHelpers
 
     }
 
-    static public function get_audit_status($status): void
+    static public function get_audit_status($status, bool $reverseColors = false): void
     {
         if (is_bool($status)) {
-            ?>
-            <span class="kw-found-<?= $status ? 'yes' : 'no'; ?>">
-                <?= $status ? 'yes' : 'no'; ?>
-            </span>
-            <?php
+            if (!$reverseColors){
+                ?>
+                <span class="kw-found-<?= $status ? 'yes' : 'no'; ?>">
+                    <?= $status ? 'yes' : 'no'; ?>
+                </span>
+                <?php
+            } else {
+                ?>
+                <span class="kw-found-<?= !$status ? 'yes' : 'no'; ?>">
+                    <?= $status ? 'yes' : 'no'; ?>
+                </span>
+                <?php
+            }
+
         } else {
             $state = "missing";
             if ($status >= 0 && $status < 1) {
@@ -234,16 +243,34 @@ class ChatGptSeoHelpers
         return ['content' => $content, 'status' => $status];
     }
 
-
-    static public function save_html_to_file($url, $html)
+    static public function generate_file_name($name): string
     {
+        return md5($name);
+    }
 
-        file_put_contents(CHAT_GPT_SEO_UPLOAD_DIR . "/" . md5($url) . ".html", $html);
+
+    static public function save_json($name, $data)
+    {
+        file_put_contents(CHAT_GPT_SEO_UPLOAD_DIR . "/" . self::generate_file_name($name) . ".json", json_encode($data, JSON_PRETTY_PRINT));
+    }
+
+    static public function get_json($name): array|bool
+    {
+        $file = CHAT_GPT_SEO_UPLOAD_DIR . "/" . self::generate_file_name($name) . ".json";
+        if (file_exists($file)) {
+            return json_decode(file_get_contents($file), TRUE);
+        }
+        return false;
+    }
+
+    static public function save_html_to_file($url, $html): void
+    {
+        file_put_contents(CHAT_GPT_SEO_REPORT_DIR . "/" . self::generate_file_name($url) . ".html", $html);
     }
 
     static public function get_html_from_file($url)
     {
-        $file = CHAT_GPT_SEO_UPLOAD_DIR . "/" . md5($url) . ".html";
+        $file = CHAT_GPT_SEO_REPORT_DIR . "/" . self::generate_file_name($url) . ".html";
         if (file_exists($file)) {
             return file_get_contents($file);
         }
@@ -266,18 +293,18 @@ class ChatGptSeoHelpers
 
         return [
             'first_row_html' => $first_row_html,
-            'Second_row_html' => $second_row_html,
+            'second_row_html' => $second_row_html,
         ];
     }
 
     static public function save_report($url, $report)
     {
-        file_put_contents(CHAT_GPT_SEO_UPLOAD_DIR . "/" . md5($url) . ".json", json_encode($report, JSON_PRETTY_PRINT));
+        file_put_contents(CHAT_GPT_SEO_REPORT_DIR . "/" . self::generate_file_name($url) . ".json", json_encode($report, JSON_PRETTY_PRINT));
     }
 
     static public function get_report($url)
     {
-        $file = CHAT_GPT_SEO_UPLOAD_DIR . "/" . md5($url) . ".json";
+        $file = CHAT_GPT_SEO_REPORT_DIR . "/" . self::generate_file_name($url) . ".json";
         if (file_exists($file)) {
             return json_decode(file_get_contents($file), true);
         }
@@ -286,8 +313,8 @@ class ChatGptSeoHelpers
 
     static public function remove_report($url)
     {
-        $file_html = CHAT_GPT_SEO_UPLOAD_DIR . "/" . md5($url) . ".html";
-        $file_json = CHAT_GPT_SEO_UPLOAD_DIR . "/" . md5($url) . ".json";
+        $file_html = CHAT_GPT_SEO_UPLOAD_DIR . "/" . self::generate_file_name($url) . ".html";
+        $file_json = CHAT_GPT_SEO_UPLOAD_DIR . "/" . self::generate_file_name($url) . ".json";
         if (file_exists($file_html)) {
             unlink($file_html);
         }
@@ -298,8 +325,8 @@ class ChatGptSeoHelpers
 
     static public function get_report_url($url): bool|string
     {
-        $file_url = CHAT_GPT_SEO_UPLOAD_URL . "/" . md5($url) . ".json";
-        $file = CHAT_GPT_SEO_UPLOAD_DIR . "/" . md5($url) . ".json";
+        $file_url = CHAT_GPT_SEO_REPORT_URL . "/" . self::generate_file_name($url) . ".json";
+        $file = CHAT_GPT_SEO_REPORT_DIR . "/" . self::generate_file_name($url) . ".json";
         if (file_exists($file)) {
             return $file_url;
         }
@@ -308,8 +335,8 @@ class ChatGptSeoHelpers
 
     static public function get_report_html_url($url): bool|string
     {
-        $file_url = CHAT_GPT_SEO_UPLOAD_URL . "/" . md5($url) . ".html";
-        $file = CHAT_GPT_SEO_UPLOAD_DIR . "/" . md5($url) . ".html";
+        $file_url = CHAT_GPT_SEO_REPORT_URL . "/" . self::generate_file_name($url) . ".html";
+        $file = CHAT_GPT_SEO_REPORT_DIR . "/" . self::generate_file_name($url) . ".html";
         if (file_exists($file)) {
             return $file_url;
         }
@@ -318,7 +345,7 @@ class ChatGptSeoHelpers
 
     static public function get_report_json($url)
     {
-        $file = CHAT_GPT_SEO_UPLOAD_DIR . "/" . md5($url) . ".json";
+        $file = CHAT_GPT_SEO_REPORT_DIR . "/" . self::generate_file_name($url) . ".json";
         if (file_exists($file)) {
             return file_get_contents($file);
         }
@@ -439,13 +466,17 @@ class ChatGptSeoHelpers
             $report['html_empty'] = true;
             return $report;
         }
+
+
         self::init();
+
 
         $doc = new \DOMDocument();
         libxml_use_internal_errors(true);
         $doc->loadHTML($html);
         $errors = libxml_get_errors();
         $tags = ['a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'title', 'img'];
+
 
         foreach ($tags as $tag) {
             $report = self::audit_tags($tag, $doc, $report);
@@ -460,6 +491,7 @@ class ChatGptSeoHelpers
         $report['h1_text'] = $h1Text;
 
         $report['html_errors'] = $errors;
+
         $report = self::get_meta($doc, $report);
 
 
@@ -508,12 +540,18 @@ class ChatGptSeoHelpers
 
     static public function get_meta($dom, $report)
     {
+
+        $id = (int)$report['id'];
         $meta_fields = $dom->getElementsByTagName("meta");
 
         $report['meta_description'] = false;
+        $report['meta_description_text'] = '';
         $report['meta_image'] = false;
         $report['meta_description_keyword_found'] = false;
+        $report['meta_description_duplicate'] = false;
+        $report['meta_title_duplicate'] = false;
         $report['textualContent'] = "";
+
 
         foreach ($meta_fields as $meta_field) {
 
@@ -524,6 +562,9 @@ class ChatGptSeoHelpers
                     $report['meta_description'] = true;
                     $report['meta_description_keyword_found'] = self::has_keywords($meta_field_content, 'in_meta_description');
                     $report['textualContent'] .= " " . $meta_field_content;
+                    $report['meta_description_text'] = $meta_field_content;
+                    $report['meta_description_duplicate'] = self::meta_description_is_unique($id, $meta_field_content);
+                    $report['meta_descriptions'] = self::get_all_fields('meta_description_text');
                 }
             }
 
@@ -536,10 +577,15 @@ class ChatGptSeoHelpers
             }
         }
 
+        $report['meta_title_text'] = '';
+        $report['meta_title_keyword_found'] = false;
+        $report['meta_title_duplicate'] = false;
         $titles = $dom->getElementsByTagName("title");
         if (count($titles)) {
             $report['meta_title_text'] = $titles[0]->textContent;
             $report['meta_title_keyword_found'] = self::has_keywords($report['meta_title_text'], 'in_title_tag');
+            $report['meta_title_duplicate'] = self::meta_title_is_unique($id, $titles[0]->textContent);
+            $report['meta_titles'] = self::get_all_fields('meta_title_text');
         }
         return $report;
     }
@@ -550,4 +596,64 @@ class ChatGptSeoHelpers
         $text = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $html);
         return strip_tags($text);
     }
+
+    private static function string_to_id($text)
+    {
+        $return_text = strip_tags($text);
+        $return_text = preg_replace('/\s+/', ' ', $return_text);
+        $return_text = sanitize_title($text);
+        return trim($return_text);
+    }
+
+    public static function meta_description_is_unique(int $id, string $meta_field_content): bool
+    {
+        $description = self::string_to_id($meta_field_content);
+
+        $all_descriptions = self::get_all_fields('meta_description_text');
+
+        $current_description = $all_descriptions[$description] ?? [];
+
+        if (count($current_description) > 1 || (count($current_description) == 1 && !in_array($id, $current_description))) {
+            return true;
+        }
+        return false;
+    }
+
+
+    private static function get_all_fields(string $field): array
+    {
+        $data = [];
+        $files = scandir(CHAT_GPT_SEO_REPORT_DIR);
+
+        foreach ($files as $file) {
+            $full_path = CHAT_GPT_SEO_REPORT_DIR . "/" . $file;
+            $ext = explode(".", $full_path);
+            $ext = end($ext);
+            if ($file !== ".." && $file !== "." && $ext === 'json' && file_exists($full_path)) {
+
+                $report = json_decode(file_get_contents($full_path),TRUE);
+                if (isset($report[$field])) {
+                    $field_value = self::string_to_id($report[$field]);
+                    $id = (int)$report['id'];
+                    if (!isset($data[$field_value])) {
+                        $data[$field_value] = [];
+                    }
+                    $data[$field_value][] = $id;
+                }
+            }
+        }
+        return $data;
+    }
+
+    private static function meta_title_is_unique(int $id, string $meta_title): bool
+    {
+        $title = self::string_to_id($meta_title);
+        $all_meta_titles = self::get_all_fields('meta_title_text');
+        $current_meta_title = $all_meta_titles[$title] ?? [];
+        if (count($current_meta_title) > 1 || count($current_meta_title) == 1 && !in_array($id, $current_meta_title)) {
+            return true;
+        }
+        return false;
+    }
+
 }

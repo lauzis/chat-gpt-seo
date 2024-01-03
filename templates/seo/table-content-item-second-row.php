@@ -43,7 +43,7 @@ if ($report && !$report['meta_title_keyword_found']) {
     $penalty++;
 } ?>
 
-<td colspan="14">
+<td colspan="18">
     <div class="seo-more-info-container">
         <p>
             <strong>Post title </strong>:<?= get_the_title($id); ?> <br/>

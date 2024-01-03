@@ -21,8 +21,16 @@ class ChatBot
      */
     public function __construct()
     {
+
+        $test_mode = get_field('chat_gpt_seo_test_mode', 'option');
+        $token = get_field('chat_gpt_seo_test_token', 'option');
+        if (!$test_mode){
+            $token = get_field('chat_gpt_seo_live_token', 'option');
+        }
+
+
         // This token is not real, in case you were thinking what I'm thinking...
-        $this->authorization = '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';
+        $this->authorization = $token;
         $this->endpoint = 'https://api.openai.com/v1/chat/completions';
     }
 
@@ -50,7 +58,7 @@ class ChatBot
             'messages' => [
                 [
                     'role' => 'system',
-                    'content' => 'Generate summary under for given text  for SEO purposes.
+                    'content' => 'You are SEO content copywriter. Generate summary for given text  for SEO purposes.
                      ' . $consideration . '
                      The summary should description of the article, not as a call to action. 
                      The summary must be under 200 characters!!!

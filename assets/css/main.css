@@ -1,0 +1,140 @@
+ul.soe-chat-gpt-keyword-list li {
+    padding-left: 30px;
+}
+
+.kw-found-yes, .kw-found-some-are-missing, .kw-found-ok {
+    color: green;
+    padding: 15px;
+}
+
+
+.kw-found-no, .kw-found-missing {
+    color: red;
+    padding: 15px;
+}
+
+.kw-found-mostly-missing {
+    color: orangered;
+    padding: 15px;
+}
+
+.chat-gpt-seo-table {
+    background-color: white;
+    border-radius: 10px;
+}
+
+.chat-gpt-seo-table th,
+.chat-gpt-seo-table td {
+    padding: 7px 15px;
+}
+
+.chat-gpt-seo-table th {
+    font-size: 14px;
+}
+
+.chat-gpt-seo-table tr:nth-child(2n) {
+    background-color: lightblue;
+}
+
+.seo-more-details {
+    overflow: hidden;
+    height: 0;
+    display: none;
+}
+
+.seo-more-details.show {
+    height: auto;
+    display: table-row;
+}
+
+.seo-more-info-container {
+    margin: auto;
+    padding: 30px;
+    max-width: 600px;
+}
+
+.seo-more-info-container textarea {
+    width: 100%;
+    height: 400px;
+}
+
+.button-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
+}
+
+.seo-more-info-container a {
+
+    cursor: pointer;
+    width: auto;
+
+    display: inline-block;
+    padding: 15px 30px;
+    border-radius: 6px;
+    background-color: lightgreen;
+    border: 1px solid green;
+    margin: 15px auto 15px autp;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    color: black;
+    text-decoration: none;
+}
+
+.seo-more-info-container p {
+    font-size: 14px;
+}
+
+.seo-more-info-container p span {
+    font-size: 12px;
+}
+
+.seo-more-info-container a.secondary {
+    background-color: lightgrey;
+    border: 1px solid grey;
+}
+
+.keyword-list ul, .keyword-list li {
+    width: 100%;
+    display: block;
+}
+
+.keyword-list ul > li > ul > li {
+    padding-left: 30px;
+    display: block;
+    width: 100%;
+}
+
+ul.found-keywords {
+    margin: 0;
+
+
+}
+
+ul.found-keywords li {
+    margin: 0;
+    padding: 0;
+    padding-left: 15px;
+}
+
+ul.found-in-places li {
+    padding-left: 30px;
+    font-size: 12px;
+}
+
+.chat-gpt-seo-status-wrap{
+    width:100%;
+    height:20px;
+    overflow: hidden;
+    border-width:1px;
+    border-style: solid;
+    border-color:black;
+}
+
+.chat-gpt-seo-status{
+    width:10%;
+    height:20px;
+    overflow: hidden;
+    background: lightgreen;
+}

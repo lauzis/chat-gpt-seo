@@ -1,5 +1,5 @@
 <?php
-if (empty($id)){
+if (empty($id)) {
     ?>
     <tr>
         <td colspan="13">
@@ -39,45 +39,57 @@ if ($report && !$report['meta_title_keyword_found']) {
     $penalty++;
 }
 
+if ($report && $report['meta_description_duplicate']) {
+    $penalty++;
+}
+
+if ($report && $report['meta_title_duplicate']) {
+    $penalty++;
+}
+
 $time = date("Y-m-d H:i:s");
-if ($report){
+if ($report) {
     $time = date("Y-m-d H:i:s", $report['timestamp']);
 }
 
 
-
 ?>
 
-    <td>
-        <?= get_the_title($id); ?>
-    </td>
+<td>
+    <?= $id; ?>
+</td>
+<td>
+    <?= get_the_title($id); ?>
+</td>
 
-    <td><?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($report && $report['meta_title_keyword_found']); ?></td>
-    <td><?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($report && $report['meta_description']); ?></td>
-    <td><?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($report && $report['meta_description_keyword_found']); ?></td>
-    <td><?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($report && $report['h1_count'] > 0); ?></td>
-    <td><?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($report && $report['h1_found_keyword'] > 0); ?></td>
-    <td><?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($report && $report['first_paragraph_found_keywords']); ?></td>
-    <td><?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($report && $report['content_has_keywords']); ?></td>
+<td><?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($report && $report['meta_title_keyword_found']); ?></td>
+<td><?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($report && $report['meta_title_duplicate'], true); ?></td>
+<td><?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($report && $report['meta_description']); ?></td>
+<td><?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($report && $report['meta_description_keyword_found']); ?></td>
+<td><?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($report && $report['meta_description_duplicate'], true); ?></td>
+<td><?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($report && $report['h1_count'] > 0); ?></td>
+<td><?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($report && $report['h1_found_keyword'] > 0); ?></td>
+<td><?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($report && $report['first_paragraph_found_keywords']); ?></td>
+<td><?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($report && $report['content_has_keywords']); ?></td>
 
-    <td><?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($report && isset($report['img_alt_missing']) ? floor(count($report['img_alt_missing']) / $report['img_count'] * 100) : false); ?></td>
+<td><?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($report && isset($report['img_alt_missing']) ? floor(count($report['img_alt_missing']) / $report['img_count'] * 100) : false); ?></td>
 
 
-    <td><span id="penalty-<?= $id ?>"><?= $penalty ?></span></td>
-    <td><span ><?= $time ?></span></td>
+<td><span id="penalty-<?= $id ?>"><?= $penalty ?></span></td>
+<td><span><?= $time ?></span></td>
 
-    <td>
-        <a onclick="expandReport(<?= $id; ?>)">More info</a>
-    </td>
-    <td>
-        <a onclick="reAudit(<?= $id; ?>)">ReAudit</a>
-    </td>
-    <td>
-        <a href="<?= get_the_permalink($id); ?>" target="_blank">View page</a>
-    </td>
-    <td>
-       --> <?php edit_post_link(__('Edit page'), "", "", $id); ?><--
-    </td>
+<td>
+    <a onclick="expandReport(<?= $id; ?>)">More info</a>
+</td>
+<td>
+    <a onclick="reAudit(<?= $id; ?>)">Re-audit</a>
+</td>
+<td>
+    <a href="<?= get_the_permalink($id); ?>" target="_blank">View page</a>
+</td>
+<td>
+    <?php edit_post_link(__('Edit page'), "", "", $id); ?>
+</td>
 
 
 

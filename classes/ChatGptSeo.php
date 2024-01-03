@@ -16,6 +16,9 @@ class ChatGptSeo
             $this->add_options_page();
             add_action('admin_menu', [$this, 'add_chat_gpt_seo_log_page']);
         }
+
+
+
         $this->setup_hooks();
         $this->setup_cron();
         $this->setup_api_routes();
@@ -104,14 +107,33 @@ class ChatGptSeo
     }
 
 
+    public function add_settings_link($links) {
+        $settings_link = '<a href="admin.php?page=chat-gpt-seo-logs">'.__('Settings','chat-gpt-seo').'</a>';
+        array_unshift($links, $settings_link);
+        return $links;
+    }
+
+
     private function setup_hooks():void
     {
-        // action hook
-        add_action('wp_login', [$this, 'handle_user_login'], 100, 2);
+        //add_action('wp_login', [$this, 'handle_user_login'], 100, 2);
         add_action("wp_ajax_get_company", [$this, 'ajax_get_company_by_registration_number']);
         add_action("wp_ajax_nopriv_get_company", [$this, 'ajax_no_priv_get_company_by_registration_number']);
         add_action("wp_ajax_update_company_customer_number", [$this, 'ajax_update_customer_number']);
         add_action("wp_ajax_nopriv_update_company_customer_number", [$this, 'ajax_update_customer_number']);
+        add_filter('plugin_action_links_chat-gpt-seo', [$this,'add_settings_link']);
+        add_action('admin_enqueue_scripts', [$this,'enqueue_plugin_styles']);
+        add_action('admin_enqueue_scripts', [$this,'enqueue_plugin_scripts']);
+    }
+
+    public function enqueue_plugin_styles():void
+    {
+        wp_enqueue_style('plugin-styles', CHAT_GPT_SEO_PLUGIN_URL. '/assets/css/main.css');
+    }
+
+    public function enqueue_plugin_scripts():void
+    {
+        wp_enqueue_script('plugin-scripts', CHAT_GPT_SEO_PLUGIN_URL . '/assets/js/main.js', array(),  CHAT_GPT_SEO_VERSION, true);
     }
 
     public function add_chat_gpt_seo_log_page():void
@@ -180,13 +202,8 @@ class ChatGptSeo
     {
         $test_mode = get_field('chat_gpt_seo_test_mode', 'option');
         $token = get_field('chat_gpt_seo_test_token', 'option');
-        $url = get_field('chat_gpt_seo_test_url', 'option');
 
-        if (!$test_mode) {
-            $token = get_field('chat_gpt_seo_live_token', 'option');
-            $url = get_field('chat_gpt_seo_live_url', 'option');
-        }
-        return ['token' => $token, 'url' => $url];
+
     }
 
 

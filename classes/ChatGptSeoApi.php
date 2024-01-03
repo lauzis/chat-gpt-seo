@@ -32,9 +32,9 @@ class ChatGptSeoApi
         $id = $request->get_param('id');
         $url = get_the_permalink($id);
 
-        $result = \ChatGptSeo\ChatGptSeoHelpers::get_HTML($url);
+
         $report = [
-            'status' => $result['status'],
+            'status' => 0,
             'url' => $url,
             'id' => $id,
             'timestamp' => time()
@@ -42,17 +42,30 @@ class ChatGptSeoApi
 
 
         $fromFile = false;
-        $html = \ChatGptSeo\ChatGptSeoHelpers::get_html_from_file($url);
-        if (!empty($html)) {
+        $html_from_file = \ChatGptSeo\ChatGptSeoHelpers::get_html_from_file($url);
+        $report_from_file = \ChatGptSeo\ChatGptSeoHelpers::get_report($url);
+
+        if (!empty($html_from_file) && !empty($report_from_file)) {
             $fromFile = true;
-            $report = \ChatGptSeo\ChatGptSeoHelpers::get_report($url);
+            $html = $html_from_file;
+            $report = $report_from_file;
         } else {
             sleep(1);
+            $result = \ChatGptSeo\ChatGptSeoHelpers::get_HTML($url);
+            $html = $result['content'];
+            $report['status']= $result['status'];
+
+            //todo sleep get from settings
             $fromFile = false;
             $html = $result['content'];
             $status = $result['status'];
+
             $reports['status'] = $status;
-            \ChatGptSeo\ChatGptSeoHelpers::save_html_to_file($url, $html);
+
+            if (!empty($html)) {
+                \ChatGptSeo\ChatGptSeoHelpers::save_html_to_file($url, $html);
+            }
+
             $report = \ChatGptSeo\ChatGptSeoHelpers::audit_html($html, $report);
             $report['keywords'] = \ChatGptSeo\ChatGptSeoHelpers::$keywords;
             \ChatGptSeo\ChatGptSeoHelpers::save_report($url, $report);
