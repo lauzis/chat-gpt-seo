@@ -2,7 +2,8 @@
     Seo audit
 </h1>
 
-<?php include(CHAT_GPT_SEO_PLUGIN_DIR.'/templates/seo/section-keywords.php'); ?>
+<?php include(CHAT_GPT_SEO_PLUGIN_DIR . '/templates/sections/keywords.php'); ?>
+
 
 <?php
 
@@ -22,26 +23,30 @@ $postSettings = [
 ];
 ?>
 
-<h2>
-    Status: <div class="chat-gpt-seo-status-wrap">
-        <div class="chat-gpt-seo-status"></div>
-    </div>
-</h2>
+
+
+
+<?php include(CHAT_GPT_SEO_PLUGIN_DIR . '/templates/sections/status.php'); ?>
 
 <?php foreach ($postSettings as $type => $settings): ?>
-    <h2><?= $type ?></h2>
-    <?php $items = get_posts($settings); ?>
+    <section class="chat-gpt-seo-audit">
+        <h2><?= $type ?></h2>
+        <?php $items = get_posts($settings); ?>
 
 
-    <?php if ($items): ?>
-        <?php include(CHAT_GPT_SEO_PLUGIN_DIR . "/templates/seo/table-header.php"); ?>
-        <?php include(CHAT_GPT_SEO_PLUGIN_DIR . "/templates/seo/table-content.php"); ?>
-        <?php include(CHAT_GPT_SEO_PLUGIN_DIR . "/templates/seo/table-footer.php"); ?>
-    <?php else : ?>
-        <pre>
+        <?php if ($items): ?>
+            <?php include(CHAT_GPT_SEO_PLUGIN_DIR . "/templates/seo/table-header.php"); ?>
+            <?php include(CHAT_GPT_SEO_PLUGIN_DIR . "/templates/seo/table-content.php"); ?>
+            <?php include(CHAT_GPT_SEO_PLUGIN_DIR . "/templates/seo/table-footer.php"); ?>
+        <?php else : ?>
+            <pre>
             <?php print_r($items); ?>
         </pre>
-    <?php endif; ?>
-
+        <?php endif; ?>
+    </section>
 <?php endforeach; ?>
 
+
+
+
+<?php include(CHAT_GPT_SEO_PLUGIN_DIR . '/templates/sections/modal.php'); ?>

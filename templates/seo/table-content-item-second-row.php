@@ -1,13 +1,6 @@
 <?php
-if (empty($id)) {
-    ?>
-    <tr>
-        <td colspan="13">
-            Missing ID
-        </td>
-    </tr>
-    <?php
-}
+
+
 $url = get_the_permalink($id);
 $report = false;
 
@@ -43,7 +36,8 @@ if ($report && !$report['meta_title_keyword_found']) {
     $penalty++;
 } ?>
 
-<td colspan="18">
+
+<div id="cgs-more-details-<?= $id; ?>" class="seo-more-details">
     <div class="seo-more-info-container">
         <p>
             <strong>Post title </strong>:<?= get_the_title($id); ?> <br/>
@@ -51,6 +45,7 @@ if ($report && !$report['meta_title_keyword_found']) {
             <strong>H1</strong>: <?= $report['h1_text']; ?> <br/>
             <strong>First paragraph</strong>: <?= $report['first_paragraph']; ?> <br/>
             <strong>Meta description</strong>: <?= get_post_meta($id, '_yoast_wpseo_metadesc', true) ?> <br/>
+            <strong>Keywords</strong>: <?= get_post_meta($id, '_yoast_wpseo_metadesc', true) ?> <br/>
             <strong>Keywords found</strong>:
 
         <ul class="found-keywords">
@@ -150,7 +145,7 @@ if ($report && !$report['meta_title_keyword_found']) {
                         &nbsp;
                     </div>
                     <label>
-                        <input type="checkbox" name="force-keyword" value="1"/> Force use keyword
+                        <input type="checkbox" name="force-keyword" value="1"/> Strongly suggest use of keywords
                     </label>
                 </div>
 
@@ -160,10 +155,11 @@ if ($report && !$report['meta_title_keyword_found']) {
 
         <div class="button-row">
             <a class="secondary" target="_blank" href="<?= $report_url; ?>">Full report</a> <br/>
-            <a class="secondary" target="_blank" href="<?= $report_url; ?>">Scraped HTML</a>
+            <a class="secondary" target="_blank" href="<?= $report_html_url; ?>">Scraped HTML</a>
         </div>
 
     </div>
+</div>
 
-</td>
+
 

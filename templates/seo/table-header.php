@@ -13,9 +13,13 @@
             <th>First paragraph contains kw</th>
             <th>Content contains kw</th>
             <th>Alt</th>
-            <th>Penalty</th>
-            <th colspan="3">Actions</th>
 
+            <th>Penalty</th>
+            <th>Craw Time</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
         </tr>
     </thead>
     <tbody>

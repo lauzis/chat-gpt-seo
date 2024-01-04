@@ -2,7 +2,7 @@
 if (empty($id)) {
     ?>
     <tr>
-        <td colspan="13">
+        <td colspan="18">
             Missing ID
         </td>
     </tr>
@@ -57,6 +57,7 @@ if ($report) {
 
 <td>
     <?= $id; ?>
+    <?php include(CHAT_GPT_SEO_PLUGIN_DIR."/templates/seo/table-content-item-second-row.php"); ?>
 </td>
 <td>
     <?= get_the_title($id); ?>

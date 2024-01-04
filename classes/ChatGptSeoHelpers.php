@@ -10,16 +10,7 @@ class ChatGptSeoHelpers
     static array $keywords = [];
     static bool $initialized = false;
 
-
-    static function init(): void
-    {
-        if (!self::$initialized) {
-            self::$initialized = true;
-            self::$keywords = self::get_keywords();
-        }
-    }
-
-    static function get_keywords($id = 'option'): array
+    static public function get_keywords_arr($id = 'option'): array
     {
         $full_list_of_keywords = [];
         if (have_rows('keyword_list', $id)) {
@@ -50,13 +41,25 @@ class ChatGptSeoHelpers
             }
         }
         return $full_list_of_keywords;
+    }
 
+    static public function get_keywords($id = 'option'): array
+    {
+        $full_list_of_keywords = [];
+        if ($id !== 'option') {
+            $full_list_of_keywords = self::get_keywords_arr($id);
+        }
+        if (empty($full_list_of_keywords)){
+            $full_list_of_keywords = !empty(self::$keywords) ? self::$keywords : self::get_keywords_arr();
+        }
+        self::$keywords = $full_list_of_keywords;
+        return $full_list_of_keywords;
     }
 
     static public function get_audit_status($status, bool $reverseColors = false): void
     {
         if (is_bool($status)) {
-            if (!$reverseColors){
+            if (!$reverseColors) {
                 ?>
                 <span class="kw-found-<?= $status ? 'yes' : 'no'; ?>">
                     <?= $status ? 'yes' : 'no'; ?>
@@ -132,7 +135,6 @@ class ChatGptSeoHelpers
         if (empty($text) && strlen(trim($text)) === 0) {
             return false;
         }
-        self::init();
         $keywordList = self::$keywords;
         $keywordFound = false;
         foreach ($keywordList as $k_key => $keyword) {
@@ -245,7 +247,7 @@ class ChatGptSeoHelpers
 
     static public function generate_file_name($name): string
     {
-        return md5($name);
+        return md5(NONCE_SALT . $name);
     }
 
 
@@ -467,10 +469,6 @@ class ChatGptSeoHelpers
             return $report;
         }
 
-
-        self::init();
-
-
         $doc = new \DOMDocument();
         libxml_use_internal_errors(true);
         $doc->loadHTML($html);
@@ -631,7 +629,7 @@ class ChatGptSeoHelpers
             $ext = end($ext);
             if ($file !== ".." && $file !== "." && $ext === 'json' && file_exists($full_path)) {
 
-                $report = json_decode(file_get_contents($full_path),TRUE);
+                $report = json_decode(file_get_contents($full_path), TRUE);
                 if (isset($report[$field])) {
                     $field_value = self::string_to_id($report[$field]);
                     $id = (int)$report['id'];

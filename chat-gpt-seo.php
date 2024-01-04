@@ -3,7 +3,7 @@
 /**
  * Plugin Name: Chat GPT SEO
  * Plugin URI: https://www.awave.com/
- * Description: Seo analysis for pages and posts, allows to generate description via chatgpt (token required)
+ * Description: SEO analysis for pages and posts. Generate meta description using chat-gpt.
  * Version: 1.0.10
  * Author: Awave AB
  * Author URI: https://www.awave.com/
@@ -23,6 +23,11 @@ if (!defined('CHAT_GPT_SEO_PLUGIN_DIR')) {
 
 if (!defined('CHAT_GPT_SEO_PLUGIN_URL')) {
     define('CHAT_GPT_SEO_PLUGIN_URL', untrailingslashit(plugin_dir_url(__FILE__)));
+}
+
+if (!defined('CHAT_GPT_SEO_PLUGIN_FILE')) {
+    define('CHAT_GPT_SEO_PLUGIN_FILE', plugin_basename(__FILE__));
+
 }
 
 if (!defined('CHAT_GPT_SEO_UPLOAD_DIR')) {
@@ -63,9 +68,43 @@ function CHAT_GPT_SEO_init():void
 {
     $chatGptSeo = new \ChatGptSeo\ChatGptSeo();
     $chatGptSeo->init();
+
+    if (isset($_GET['chat-gpt-seo-test'])){
+        switch ($_GET['chat-gpt-seo-test']){
+            case 'keywords':
+
+                ?>
+                <pre>
+                    <?php print_r(\ChatGptSeo\ChatGptSeoHelpers::get_keywords()); ?>
+                </pre>
+
+                <pre>
+                    <?php print_r(\ChatGptSeo\ChatGptSeoHelpers::get_keywords(5428)); ?>
+                </pre>
+                <?php
+
+                break;
+        }
+        die();
+    }
+
+
+
+//    print(CHAT_GPT_SEO_PLUGIN_FILE);
+//    print("<br/>");
+//    print('plugin_action_links_' . plugin_basename(__FILE__));
+//    die();
+//
+//    add_filter( 'plugin_action_links_' . plugin_basename(__FILE__), 'add_action_links' );
+//    function add_action_links ( $links ) {
+//        $mylinks = array(
+//            '<a href="' . admin_url( 'options-general.php?page=mysettings' ) . '">Settings</a>',
+//        );
+//        return array_merge( $links, $mylinks );
+//    }
+
+
 }
 
 add_action('init', 'CHAT_GPT_SEO_init');
-
-
 

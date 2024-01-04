@@ -1,4 +1,3 @@
-
 function httpPost(url, headers, data, callback, failCallBack) {
 
   var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
@@ -33,7 +32,6 @@ function httpGet(url, headers, callback, failCallBack) {
       const status = xmlhttp.status;
       if (status === 200) {
         try {
-          console.log("succes data");
           callback(JSON.parse(xmlhttp.response), url, headers, status);
         } catch (e) {
           console.log(e);
@@ -65,11 +63,29 @@ function httpGet(url, headers, callback, failCallBack) {
 }
 
 
+function toggleStatusBar(show) {
+  var section = document.querySelector('.cgs--status');
+  if (section) {
+    if (show) {
+      section.classList.remove('cgs--hide');
+    } else {
+      section.classList.add('cgs--hide');
+    }
+
+  }
+}
+
 function crawlData(passId) {
   var to_do = document.querySelectorAll('.chat-gpt-seo-check-post').length;
   var checked_count = document.querySelectorAll('.chat-gpt-seo-report-done').length;
-  var total  = to_do + checked_count;
-  var percents = Math.ceil(checked_count/total *100);
+  var total = to_do + checked_count;
+  var percents = Math.ceil(checked_count / total * 100);
+
+  if (percents === 100) {
+    toggleStatusBar(false)
+  } else {
+    toggleStatusBar(true)
+  }
 
   var statusElement = document.querySelector('.chat-gpt-seo-status');
   statusElement.style.width = percents + "%";
@@ -79,7 +95,7 @@ function crawlData(passId) {
   if (element) {
     id = element.getAttribute('data-id');
     element.classList.remove('chat-gpt-seo-check-post');
-    element.classList.add('chat-gpt-seo-check-checking-'+id);
+    element.classList.add('chat-gpt-seo-check-checking-' + id);
 
   }
   var force = false;
@@ -98,9 +114,9 @@ function crawlData(passId) {
   }
 
   httpGet(url, null, (data) => {
-    var element = document.querySelector('.chat-gpt-seo-check-checking-'+data.id);
-    if (element){
-      element.classList.remove('chat-gpt-seo-check-checking-'+data.id);
+    var element = document.querySelector('.chat-gpt-seo-check-checking-' + data.id);
+    if (element) {
+      element.classList.remove('chat-gpt-seo-check-checking-' + data.id);
       element.classList.add("chat-gpt-seo-report-done");
     }
     status.innerHTML = "...done...";
@@ -109,15 +125,10 @@ function crawlData(passId) {
     var firstRow = document.querySelector('#seo-summary-' + data.id);
     var secondRow = document.querySelector('#seo-more-details-' + data.id);
     if (firstRow && secondRow) {
-      console.log("setting first row",firstRow,html.first_row_html);
       firstRow.innerHTML = data.html.first_row_html;
-      console.log("setting second row",secondRow, data.html.second_row_html);
       secondRow.innerHTML = data.html.second_row_html;
     }
-
     element = document.querySelector('.chat-gpt-seo-check-post');
-
-
     if (element && !force) {
       crawlData();
     }
@@ -129,9 +140,30 @@ setTimeout(function () {
 }, 3000)
 
 
+function toggleBackground(show) {
+  console.log("toggle background....");
+  var background = document.querySelector('.cgs-modal-bg');
+  console.log(background);
+  if (show){
+    console.log("toggle background.... show");
+    background.classList.add('cgs--show');
+  } else {
+    console.log("toggle background.... hide");
+    background.classList.remove('cgs--show');
+  }
+}
+
 function expandReport(id) {
-  var row = document.querySelector('#seo-more-details-' + id);
-  row.classList.toggle('show')
+  var element = document.querySelector('#cgs-more-details-' + id);
+  console.log(element);
+  if (element){
+    element.classList.toggle('cgs--show');
+    if (element.classList.contains('.cgs--show')){
+      toggleBackground(true);
+    } else {
+      toggleBackground(true);
+    }
+  }
 }
 
 function reAudit(id) {
@@ -145,11 +177,11 @@ function getFormDate(id) {
   var formObject = {};
   formData.forEach((value, key) => {
     // Reflect.has in favor of: object.hasOwnProperty(key)
-    if(!Reflect.has(formObject, key)){
+    if (!Reflect.has(formObject, key)) {
       formObject[key] = value;
       return;
     }
-    if(!Array.isArray(formObject[key])){
+    if (!Array.isArray(formObject[key])) {
       formObject[key] = [formObject[key]];
     }
     formObject[key].push(value);
@@ -171,22 +203,25 @@ function updateMetaDescription(id) {
 }
 
 function generateMetaDescription(id) {
-  console.log("generate:", id);
-
-  var generateButton = document.querySelector('#generate-button-'+id);
+  var generateButton = document.querySelector('#generate-button-' + id);
   var originalText = generateButton.innerHTML;
-  generateButton.innerHTML="Generating";
+  generateButton.innerHTML = "Generating";
   var formData = getFormDate(id);
-  console.log(formData);
   var url = "/wp-json/chat-gpt-seo/v1/generate-meta-description/" + id;
   generateButton.setAttribute('disabled', 'disabled');
+  var textField = document.querySelector('#seo-description-' + id);
+  textField.setAttribute('readonly', 'readonly');
+  textField.setAttribute('disabled', 'disabled');
   httpPost(url, false, formData, function (data) {
     console.log("success", data);
     var metaDescription = data.response;
-    var metaDescriptionField= document.querySelector('#seo-description-'+id);
-    metaDescriptionField.value= metaDescription;
+    var metaDescriptionField = document.querySelector('#seo-description-' + id);
+    metaDescriptionField.value = metaDescription;
     generateButton.innerHTML = originalText;
     generateButton.removeAttribute('disabled');
+    var textField = document.querySelector('#seo-description-' + id);
+    textField.removeAttribute('readonly');
+    textField.removeAttribute('disabled');
 
   }, function (data) {
     console.log("failed", data);
@@ -194,3 +229,8 @@ function generateMetaDescription(id) {
   });
 
 }
+
+
+jQuery(document).ready(function () {
+  jQuery('.chat-gpt-seo-table').DataTable();
+});
