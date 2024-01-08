@@ -63,17 +63,19 @@ class ChatBot
         }
 
 
+        $rules = 'You are SEO content copywriter. write summary for given text for SEO purposes.
+                     ' . $consideration . '
+                     The summary should description of the article, not as a call to action. 
+                     The summary must be under 200 characters!!!
+                     The summary should always be written in the same language as the article itself is.
+                     ';
+
 
         $data = [
             'messages' => [
                 [
                     'role' => 'system',
-                    'content' => 'You are SEO content copywriter. write summary for given text for SEO purposes.
-                     ' . $consideration . '
-                     The summary should description of the article, not as a call to action. 
-                     The summary must be under 200 characters!!!
-                     The summary should be in the same language as the article itself is.
-                     '
+                    'content' => $rules
                 ],
                 [
                     'role' => 'user',

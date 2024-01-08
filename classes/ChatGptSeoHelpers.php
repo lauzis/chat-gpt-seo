@@ -61,13 +61,13 @@ class ChatGptSeoHelpers
         if (is_bool($status)) {
             if (!$reverseColors) {
                 ?>
-                <span class="kw-found-<?= $status ? 'yes' : 'no'; ?>">
+                <span class="cgs-status kw-found-<?= $status ? 'yes' : 'no'; ?>">
                     <?= $status ? 'yes' : 'no'; ?>
                 </span>
                 <?php
             } else {
                 ?>
-                <span class="kw-found-<?= !$status ? 'yes' : 'no'; ?>">
+                <span class="cgs-status kw-found-<?= !$status ? 'yes' : 'no'; ?>">
                     <?= $status ? 'yes' : 'no'; ?>
                 </span>
                 <?php
@@ -94,7 +94,7 @@ class ChatGptSeoHelpers
                 $state = "missing";
             }
             ?>
-            <span class="kw-found-<?= $state ?>">
+            <span class="cgs-status kw-found-<?= $state ?>">
                 <?= $state; ?>
             </span>
             <?php
@@ -315,8 +315,13 @@ class ChatGptSeoHelpers
 
     static public function remove_report($url)
     {
-        $file_html = CHAT_GPT_SEO_UPLOAD_DIR . "/" . self::generate_file_name($url) . ".html";
-        $file_json = CHAT_GPT_SEO_UPLOAD_DIR . "/" . self::generate_file_name($url) . ".json";
+        $file_html = CHAT_GPT_SEO_REPORT_DIR . "/" . self::generate_file_name($url) . ".html";
+        $file_json = CHAT_GPT_SEO_REPORT_DIR . "/" . self::generate_file_name($url) . ".json";
+        $file_html_prev = CHAT_GPT_SEO_REPORT_DIR . "/" . self::generate_file_name($url) . ".prev.html";
+        $file_json_prev = CHAT_GPT_SEO_REPORT_DIR . "/" . self::generate_file_name($url) . ".prev.json";
+        file_put_contents($file_html_prev,file_get_contents($file_html));
+        file_put_contents($file_json_prev,file_get_contents($file_json));
+
         if (file_exists($file_html)) {
             unlink($file_html);
         }

@@ -133,7 +133,10 @@ if ($report && !$report['meta_title_keyword_found']) {
                     </ul>
                 </div>
                 <div class="button-row">
-                    <a onclick="updateMetaDescription(<?= $id; ?>)">Update meta description</a>
+                    <a
+                            id="update-meta-description-button-<?= $id; ?>"
+                            data-original-button-text="Update meta description"
+                            onclick="updateMetaDescription(<?= $id; ?>)">Update meta description</a>
                     <div>
                         <a id="generate-button-<?= $id; ?>" onclick="generateMetaDescription(<?= $id; ?>)">Generate meta
                             description</a>

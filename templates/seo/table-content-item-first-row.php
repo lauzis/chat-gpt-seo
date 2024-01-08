@@ -62,6 +62,19 @@ if ($report) {
 <td>
     <?= get_the_title($id); ?>
 </td>
+<td><span id="penalty-<?= $id ?>"><?= $penalty ?></span></td>
+<td>
+    <a onclick="expandReport(<?= $id; ?>)">More info</a>
+</td>
+<td>
+    <a onclick="reAudit(<?= $id; ?>)">Re-audit</a>
+</td>
+<td>
+    <a href="<?= get_the_permalink($id); ?>" target="_blank">View page</a>
+</td>
+<td>
+    <?php edit_post_link(__('Edit page'), "", "", $id); ?>
+</td>
 
 <td><?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($report && $report['meta_title_keyword_found']); ?></td>
 <td><?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($report && $report['meta_title_duplicate'], true); ?></td>
@@ -76,21 +89,10 @@ if ($report) {
 <td><?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($report && isset($report['img_alt_missing']) ? floor(count($report['img_alt_missing']) / $report['img_count'] * 100) : false); ?></td>
 
 
-<td><span id="penalty-<?= $id ?>"><?= $penalty ?></span></td>
+
 <td><span><?= $time ?></span></td>
 
-<td>
-    <a onclick="expandReport(<?= $id; ?>)">More info</a>
-</td>
-<td>
-    <a onclick="reAudit(<?= $id; ?>)">Re-audit</a>
-</td>
-<td>
-    <a href="<?= get_the_permalink($id); ?>" target="_blank">View page</a>
-</td>
-<td>
-    <?php edit_post_link(__('Edit page'), "", "", $id); ?>
-</td>
+
 
 
 

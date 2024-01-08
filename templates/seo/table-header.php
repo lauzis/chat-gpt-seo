@@ -3,6 +3,11 @@
         <tr>
             <th>ID</th>
             <th>Title</th>
+            <th>Penalty</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
             <th>Seo title contains kw</th>
             <th>Seo title duplicate</th>
             <th>Meta description exists</th>
@@ -13,13 +18,7 @@
             <th>First paragraph contains kw</th>
             <th>Content contains kw</th>
             <th>Alt</th>
-
-            <th>Penalty</th>
-            <th>Craw Time</th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
+            <th>Crawl Time</th>
         </tr>
     </thead>
     <tbody>

@@ -4,7 +4,7 @@
  * Plugin Name: Chat GPT SEO
  * Plugin URI: https://www.awave.com/
  * Description: SEO analysis for pages and posts. Generate meta description using chat-gpt.
- * Version: 1.0.10
+ * Version: 1.0.11
  * Author: Awave AB
  * Author URI: https://www.awave.com/
  * License: (c) 2020 Awave AB - All right reserved.
@@ -14,7 +14,7 @@
 
 
 if (!defined('CHAT_GPT_SEO_VERSION')) {
-    define('CHAT_GPT_SEO_VERSION', '1.0.10');
+    define('CHAT_GPT_SEO_VERSION', '1.0.11');
 }
 
 if (!defined('CHAT_GPT_SEO_PLUGIN_DIR')) {

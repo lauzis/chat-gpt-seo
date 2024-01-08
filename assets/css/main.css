@@ -147,6 +147,8 @@ ul.found-in-places li {
     border-width: 1px;
     border-style: solid;
     border-color: black;
+    border-radius:6px;
+    margin: 30px 0;
 }
 
 .chat-gpt-seo-status {
@@ -180,4 +182,20 @@ ul.found-in-places li {
 
 .cgs-modal-bg.cgs--show {
     display: block;
+}
+
+.dataTables_length, .dataTables_filter,.dataTables_info, .dataTables_paginate {
+    margin:30px 0;
+    width:50%;
+}
+.dataTables_length select{
+    width:auto;
+    min-width: 50px;
+}
+
+.cgs-status{
+    width:100%;
+    text-align: center;
+    display: inline-block;
+    box-sizing: border-box;
 }

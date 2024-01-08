@@ -123,10 +123,8 @@ function crawlData(passId) {
 
 
     var firstRow = document.querySelector('#seo-summary-' + data.id);
-    var secondRow = document.querySelector('#seo-more-details-' + data.id);
-    if (firstRow && secondRow) {
+    if (firstRow) {
       firstRow.innerHTML = data.html.first_row_html;
-      secondRow.innerHTML = data.html.second_row_html;
     }
     element = document.querySelector('.chat-gpt-seo-check-post');
     if (element && !force) {
@@ -141,21 +139,16 @@ setTimeout(function () {
 
 
 function toggleBackground(show) {
-  console.log("toggle background....");
   var background = document.querySelector('.cgs-modal-bg');
-  console.log(background);
   if (show){
-    console.log("toggle background.... show");
     background.classList.add('cgs--show');
   } else {
-    console.log("toggle background.... hide");
     background.classList.remove('cgs--show');
   }
 }
 
 function expandReport(id) {
   var element = document.querySelector('#cgs-more-details-' + id);
-  console.log(element);
   if (element){
     element.classList.toggle('cgs--show');
     if (element.classList.contains('.cgs--show')){
@@ -190,47 +183,95 @@ function getFormDate(id) {
   return formObject;
 }
 
+function disableTextField(id) {
+  var textField = document.querySelector('#seo-description-' + id);
+  textField.setAttribute('readonly', 'readonly');
+  textField.setAttribute('disabled', 'disabled');
+}
+
+function enableTextField(id) {
+  var textField = document.querySelector('#seo-description-' + id);
+  textField.removeAttribute('readonly');
+  textField.removeAttribute('disabled');
+}
+
 function updateMetaDescription(id) {
-  console.log("update:", id);
   var formData = getFormDate(id);
   var url = "/wp-json/chat-gpt-seo/v1/update-meta-description/" + id;
 
+  disableTextField(id);
+
+  var button = document.querySelector('#update-meta-description-button-'+id);
+  button.innerHTML = "Updating..."
+  button.setAttribute('disabled','disabled');
+
+  function resetButtonText(id){
+    var button = document.querySelector('#update-meta-description-button-'+id);
+    button.innerHTML = button.getAttribute('data-original-button-text');
+    button.removeAttribute('disabled');
+  }
+
   httpPost(url, false, formData, function (data) {
-    console.log("success", data);
+    var button = document.querySelector('#update-meta-description-button-'+id);
+    enableTextField(id);
+    button.innerHTML = "Updated";
+    setTimeout(function(){
+    resetButtonText(id);
+    },1000)
+
   }, function (data) {
-    console.log("failed", data);
+    enableTextField(id);
+    button.innerHTML = "Failed :(";
+    resetButtonText(id);
   });
 }
 
 function generateMetaDescription(id) {
   var generateButton = document.querySelector('#generate-button-' + id);
   var originalText = generateButton.innerHTML;
-  generateButton.innerHTML = "Generating";
+  generateButton.innerHTML = "Generating...";
   var formData = getFormDate(id);
   var url = "/wp-json/chat-gpt-seo/v1/generate-meta-description/" + id;
   generateButton.setAttribute('disabled', 'disabled');
-  var textField = document.querySelector('#seo-description-' + id);
-  textField.setAttribute('readonly', 'readonly');
-  textField.setAttribute('disabled', 'disabled');
+
+  disableTextField(id);
+
   httpPost(url, false, formData, function (data) {
-    console.log("success", data);
     var metaDescription = data.response;
     var metaDescriptionField = document.querySelector('#seo-description-' + id);
     metaDescriptionField.value = metaDescription;
     generateButton.innerHTML = originalText;
     generateButton.removeAttribute('disabled');
-    var textField = document.querySelector('#seo-description-' + id);
-    textField.removeAttribute('readonly');
-    textField.removeAttribute('disabled');
+    enableTextField(id)
+    generateButton.innerHTML='Generated!';
+    setTimeout(function (){
+      generateButton.innerHTML = originalText;
+    },1000)
 
   }, function (data) {
-    console.log("failed", data);
-    generateButton.innerHTML = originalText;
-  });
+    generateButton.innerHTML='Failed ;(';
+    setTimeout(function (){
+      generateButton.innerHTML = originalText;
+    },1000)
 
+  });
 }
+
+document.querySelector('.cgs-modal-bg').addEventListener('click', function(){
+  toggleBackground(false);
+  var modals= document.querySelectorAll('.cgs--show');
+  modals.forEach(function(item){
+    item.classList.remove('cgs--show');
+  })
+});
 
 
 jQuery(document).ready(function () {
-  jQuery('.chat-gpt-seo-table').DataTable();
+  jQuery('.chat-gpt-seo-table').DataTable(
+   {
+     "columnDefs": [
+       { "orderable": false, "targets": [3,4,5,6] }
+     ]
+   }
+  );
 });
