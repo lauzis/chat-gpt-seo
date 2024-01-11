@@ -9,6 +9,7 @@ class ChatGptSeoHelpers
 {
     static array $keywords = [];
     static bool $initialized = false;
+    static bool $local_keywords = false;
 
     static public function get_keywords_arr($id = 'option'): array
     {
@@ -48,6 +49,11 @@ class ChatGptSeoHelpers
         $full_list_of_keywords = [];
         if ($id !== 'option') {
             $full_list_of_keywords = self::get_keywords_arr($id);
+            if (!empty($full_list_of_keywords)){
+                self::$local_keywords = true;
+            } else {
+                self::$local_keywords = false;
+            }
         }
         if (empty($full_list_of_keywords)){
             $full_list_of_keywords = !empty(self::$keywords) ? self::$keywords : self::get_keywords_arr();
@@ -454,7 +460,6 @@ class ChatGptSeoHelpers
                     break;
 
                 default:
-                    return $report;
                     $tag_textual_content = $item->textContent;
                     if (self::has_keywords($tag_textual_content, "in_" . $tag . "_tag")) {
                         $report[$tag . '_found_keyword']++;
@@ -630,8 +635,7 @@ class ChatGptSeoHelpers
 
         foreach ($files as $file) {
             $full_path = CHAT_GPT_SEO_REPORT_DIR . "/" . $file;
-            $ext = explode(".", $full_path);
-            $ext = end($ext);
+            $ext = self::getFileExtension($full_path);
             if ($file !== ".." && $file !== "." && $ext === 'json' && file_exists($full_path)) {
 
                 $report = json_decode(file_get_contents($full_path), TRUE);
@@ -658,5 +662,13 @@ class ChatGptSeoHelpers
         }
         return false;
     }
+
+    public static function getFileExtension($file){
+        $ext = explode(".", $file);
+        $ext = end($ext);
+        return $ext;
+    }
+
+
 
 }

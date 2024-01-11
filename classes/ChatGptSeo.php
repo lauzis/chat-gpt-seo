@@ -18,11 +18,12 @@ class ChatGptSeo
         }
         $this->setup_hooks();
         $this->setup_api_routes();
+
+
     }
 
     public static function add_settings_link_to_plugin_list($links)
     {
-
         $links[] = '<a href="' . self::get_settings_page_url() . '">Settings</a>';
         return $links;
     }
@@ -38,14 +39,13 @@ class ChatGptSeo
     }
 
 
-
     public function setup_api_routes(): void
     {
 
         add_action('rest_api_init', function () {
             register_rest_route('chat-gpt-seo/v1', '/audit-item/(?P<id>\d+)', array(
                 'methods' => 'GET',
-                'callback' => 'ChatGptSeo\ChatGptSeoApi::audit_item',
+                'callback' => 'ChatGptSeo\ChatGptSeoApi::audit_item_request',
                 'args' => array(
                     'id' => array(
                         'validate_callback' => function ($param, $request, $key) {
@@ -53,11 +53,14 @@ class ChatGptSeo
                         }
                     ),
                 ),
+                'permission_callback' => function () {
+                    return current_user_can('edit_others_posts');
+                }
             ));
 
             register_rest_route('chat-gpt-seo/v1', '/force-audit-item/(?P<id>\d+)', array(
                 'methods' => 'GET',
-                'callback' => 'ChatGptSeo\ChatGptSeoApi::force_audit_item',
+                'callback' => 'ChatGptSeo\ChatGptSeoApi::force_audit_item_request',
                 'args' => array(
                     'id' => array(
                         'validate_callback' => function ($param, $request, $key) {
@@ -65,6 +68,17 @@ class ChatGptSeo
                         }
                     ),
                 ),
+                'permission_callback' => function () {
+                    return current_user_can('edit_others_posts');
+                }
+            ));
+
+            register_rest_route('chat-gpt-seo/v1', '/clear-audit-data', array(
+                'methods' => 'GET',
+                'callback' => 'ChatGptSeo\ChatGptSeoApi::clear_audit_data',
+                'permission_callback' => function () {
+                    return current_user_can('edit_others_posts');
+                }
             ));
 
             register_rest_route('chat-gpt-seo/v1', '/update-meta-description/(?P<id>\d+)', array(
@@ -77,6 +91,9 @@ class ChatGptSeo
                         }
                     ),
                 ),
+                'permission_callback' => function () {
+                    return current_user_can('edit_others_posts');
+                }
             ));
 
 
@@ -90,19 +107,12 @@ class ChatGptSeo
                         }
                     ),
                 ),
+                'permission_callback' => function () {
+                    return current_user_can('edit_others_posts');
+                }
             ));
 
         });
-    }
-
-    public function cron_add_timing($schedules): array
-    {
-        if (!isset($schedules["5min"])) {
-            $schedules["5min"] = array(
-                'interval' => 5 * 60,
-                'display' => __('Once every 5 minutes'));
-        }
-        return $schedules;
     }
 
     public function add_settings_link($links)
@@ -115,16 +125,23 @@ class ChatGptSeo
 
     private function setup_hooks(): void
     {
-        if (isset($_GET['page']) && $_GET['page'] === 'chat-gpt-seo-audit') {
+        if ((isset($_GET['page']) && $_GET['page'] === 'chat-gpt-seo-audit') || (isset($_GET['page']) && $_GET['page'] === 'chat-gpt-keyword-audit')) {
             add_action('admin_enqueue_scripts', [$this, 'enqueue_plugin_styles']);
             add_action('admin_enqueue_scripts', [$this, 'enqueue_plugin_scripts']);
+            add_action('admin_enqueue_scripts', [$this, 'my_custom_rest_api_nonce']);
         }
+    }
+
+    public function my_custom_rest_api_nonce() {
+        $nonce = wp_create_nonce('my_custom_nonce_action');
+        wp_localize_script('chat-gpt-seo-js', 'chatGptSeoNonce', ['chatGptSeoNonce' => $nonce ]);
     }
 
     public function enqueue_plugin_styles(): void
     {
         wp_enqueue_style('chat-gpt-seo-css', CHAT_GPT_SEO_PLUGIN_URL . '/assets/css/main.css');
         wp_enqueue_style('chat-gpt-seo-lib-table-styles', CHAT_GPT_SEO_PLUGIN_URL . '/assets/lib/jquery.dataTables.css');
+
 
     }
 
@@ -133,45 +150,41 @@ class ChatGptSeo
 
         wp_enqueue_script('chat-gpt-seo-lib-table-js', CHAT_GPT_SEO_PLUGIN_URL . '/assets/lib/jquery.dataTables.js.js', array('jquery'), CHAT_GPT_SEO_VERSION, true);
         wp_enqueue_script('chat-gpt-seo-js', CHAT_GPT_SEO_PLUGIN_URL . '/assets/js/main.js', array('jquery', 'chat-gpt-seo-lib-table-js'), CHAT_GPT_SEO_VERSION, true);
+
     }
 
     public function add_chat_gpt_seo_log_page(): void
     {
+        add_menu_page(
+            'SEO Audit',
+            'SEO Audit',
+            'manage_options',
+            'chat-gpt-seo-audit',
+            [$this, 'seo_audit'],//'ChatGptSeo\ChatGptSeo::seo_audit',
+            'dashicons-chart-bar', // You can change the icon
+            85 // Adjust the position as needed
+        );
 
-//        add_submenu_page(
-//            'chat-gpt-seo',
-//            __('SEO audit', 'chat-gpt-seo'),
-//            __('SEO audit', 'chat-gpt-seo'),
-//            'edit_posts',
-//            'chat-gpt-seo',
-//            [$this, 'seo_audit']
-//        );
-//
-//        add_filter('plugin_action_links_' . plugin_basename(CHAT_GPT_SEO_PLUGIN_FILE), 'ChatGptSeo\ChatGptSeo::add_settings_link_to_plugin_list');
-
-
-            add_menu_page(
-                'SEO Audit',
-                'SEO Audit',
-                'manage_options',
-                'chat-gpt-seo-audit',
-                [$this, 'seo_audit'],//'ChatGptSeo\ChatGptSeo::seo_audit',
-                'dashicons-chart-bar', // You can change the icon
-                85 // Adjust the position as needed
-            );
-
-            // Add the second sub-menu item
-//            add_submenu_page(
-//                'chat-gpt-seo-audit',
-//                'Settings',
-//                'Settings',
-//                'manage_options',
-//                'seo_audit_settings_page',
-//                'ChatGptSeo\ChatGptSeo::seo_audit_settings_page_callback'
-//            );
+        add_submenu_page(
+            'chat-gpt-seo-audit',
+            'Keyword Audit',
+            'Keyword Audit',
+            'manage_options',
+            'chat-gpt-keyword-audit',
+            [$this, 'keyword_audit']
+        );
 
     }
 
+
+    public function keyword_audit(): void
+    {
+        ?>
+        <div class="wrap">
+            <?php include(CHAT_GPT_SEO_PLUGIN_DIR . "/templates/keywords.php"); ?>
+        </div>
+        <?php
+    }
 
     public function seo_audit(): void
     {

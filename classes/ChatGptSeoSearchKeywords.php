@@ -18,7 +18,7 @@ class ChatGptSeoApi
     }
 
 
-    public static function force_audit_item_request(\WP_REST_Request $request):array
+    public static function force_audit_item(\WP_REST_Request $request)
     {
         $id = $request->get_param('id');
         $url = get_the_permalink($id);
@@ -28,18 +28,13 @@ class ChatGptSeoApi
         }
 
         \ChatGptSeo\ChatGptSeoHelpers::remove_report($url);
-        return self::audit_item_request($request);
+        return self::audit_item($request);
     }
 
-
-    public static function audit_item_request(\WP_REST_Request $request):array{
-        $id = $request->get_param('id');
-        return self::audit_item($id);
-    }
-    public static function audit_item(string  $id):array
+    public static function audit_item(\WP_REST_Request $request)
     {
 
-
+        $id = $request->get_param('id');
         $url = get_the_permalink($id);
         $keywords = \ChatGptSeo\ChatGptSeoHelpers::get_keywords($id);
 
@@ -48,8 +43,7 @@ class ChatGptSeoApi
             'url' => $url,
             'id' => $id,
             'timestamp' => time(),
-            'keywords' => $keywords,
-            'local_keywords' => \ChatGptSeo\ChatGptSeoHelpers::$local_keywords
+            'keywords' => $keywords
         ];
 
 
@@ -160,14 +154,5 @@ class ChatGptSeoApi
         ];
 
 
-    }
-
-    public static function clear_audit_data() {
-        $files = scandir(CHAT_GPT_SEO_REPORT_DIR);
-        foreach($files as $file){
-            if ($file!=='.' && $file!=='..'){
-                unlink(CHAT_GPT_SEO_REPORT_DIR."/".$file);
-            }
-        }
     }
 }

@@ -8,6 +8,7 @@
             <th></th>
             <th></th>
             <th></th>
+            <th>Keyword locally set</th>
             <th>Seo title contains kw</th>
             <th>Seo title duplicate</th>
             <th>Meta description exists</th>

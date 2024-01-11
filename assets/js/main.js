@@ -1,3 +1,12 @@
+if (!chatGptSoeIdsChecked){
+  var chatGptSoeIdsChecked = [];
+}
+
+if (!chatGptSoeIdsToAudit){
+  var chatGptSoeIdsToAudit = [];
+}
+
+
 function httpPost(url, headers, data, callback, failCallBack) {
 
   var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
@@ -15,6 +24,7 @@ function httpPost(url, headers, data, callback, failCallBack) {
   };
   xmlhttp.open("POST", url, true);
   xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+  xmlhttp.setRequestHeader('X-WP-Nonce', icl_vars.restNonce );
   if (headers && headers.headers) {
     for (const key of Object.keys(headers.headers)) {
       xmlhttp.setRequestHeader(key, headers.headers[key]);
@@ -26,6 +36,7 @@ function httpPost(url, headers, data, callback, failCallBack) {
 
 function httpGet(url, headers, callback, failCallBack) {
   var xmlhttp = new XMLHttpRequest();
+
   xmlhttp.onreadystatechange = function () {
     if (xmlhttp.readyState === XMLHttpRequest.DONE) { // XMLHttpRequest.DONE == 4
 
@@ -53,6 +64,7 @@ function httpGet(url, headers, callback, failCallBack) {
 
   xmlhttp.open("GET", url, true);
   xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+  xmlhttp.setRequestHeader('X-WP-Nonce', icl_vars.restNonce  );
   if (headers && headers.headers) {
     for (const headersKey of Object.keys(headers.headers)) {
       xmlhttp.setRequestHeader(headersKey, headers.headers[headersKey]);
@@ -62,33 +74,22 @@ function httpGet(url, headers, callback, failCallBack) {
   xmlhttp.send();
 }
 
+function checkStatus() {
+  var checked_count = chatGptSoeIdsChecked.length;
+  var total = chatGptSoeIdsToAudit.length + chatGptSoeIdsChecked.length;
 
-function toggleStatusBar(show) {
-  var section = document.querySelector('.cgs--status');
-  if (section) {
-    if (show) {
-      section.classList.remove('cgs--hide');
-    } else {
-      section.classList.add('cgs--hide');
-    }
+  var percents = Math.floor(checked_count / total * 100);
 
+  if (checked_count === total) {
+    buttonClearAuditEnable();
   }
+  var statusElement = document.querySelector('.chat-gpt-seo-status');
+  statusElement.style.width = percents + "%";
+  statusElement.innerHTML = checked_count+" / " + total +" ( "+ percents+"% )";
 }
 
 function crawlData(passId) {
-  var to_do = document.querySelectorAll('.chat-gpt-seo-check-post').length;
-  var checked_count = document.querySelectorAll('.chat-gpt-seo-report-done').length;
-  var total = to_do + checked_count;
-  var percents = Math.ceil(checked_count / total * 100);
 
-  if (percents === 100) {
-    toggleStatusBar(false)
-  } else {
-    toggleStatusBar(true)
-  }
-
-  var statusElement = document.querySelector('.chat-gpt-seo-status');
-  statusElement.style.width = percents + "%";
 
   var element = document.querySelector('.chat-gpt-seo-check-post');
   var id = passId;
@@ -96,8 +97,11 @@ function crawlData(passId) {
     id = element.getAttribute('data-id');
     element.classList.remove('chat-gpt-seo-check-post');
     element.classList.add('chat-gpt-seo-check-checking-' + id);
-
+  } else if (chatGptSoeIdsToAudit.length > 0) {
+    id = chatGptSoeIdsToAudit.pop();
   }
+  checkStatus();
+
   var force = false;
   if (passId) {
     force = true;
@@ -119,7 +123,10 @@ function crawlData(passId) {
       element.classList.remove('chat-gpt-seo-check-checking-' + data.id);
       element.classList.add("chat-gpt-seo-report-done");
     }
-    status.innerHTML = "...done...";
+    if (status) {
+      status.innerHTML = "...done...";
+    }
+    chatGptSoeIdsChecked.push(data.id);
 
 
     var firstRow = document.querySelector('#seo-summary-' + data.id);
@@ -127,20 +134,16 @@ function crawlData(passId) {
       firstRow.innerHTML = data.html.first_row_html;
     }
     element = document.querySelector('.chat-gpt-seo-check-post');
-    if (element && !force) {
+
+    if ((element && !force) || chatGptSoeIdsToAudit.length > 0) {
       crawlData();
     }
   });
 }
 
-setTimeout(function () {
-  crawlData();
-}, 3000)
-
-
 function toggleBackground(show) {
   var background = document.querySelector('.cgs-modal-bg');
-  if (show){
+  if (show) {
     background.classList.add('cgs--show');
   } else {
     background.classList.remove('cgs--show');
@@ -149,9 +152,9 @@ function toggleBackground(show) {
 
 function expandReport(id) {
   var element = document.querySelector('#cgs-more-details-' + id);
-  if (element){
+  if (element) {
     element.classList.toggle('cgs--show');
-    if (element.classList.contains('.cgs--show')){
+    if (element.classList.contains('.cgs--show')) {
       toggleBackground(true);
     } else {
       toggleBackground(true);
@@ -201,23 +204,23 @@ function updateMetaDescription(id) {
 
   disableTextField(id);
 
-  var button = document.querySelector('#update-meta-description-button-'+id);
+  var button = document.querySelector('#update-meta-description-button-' + id);
   button.innerHTML = "Updating..."
-  button.setAttribute('disabled','disabled');
+  button.setAttribute('disabled', 'disabled');
 
-  function resetButtonText(id){
-    var button = document.querySelector('#update-meta-description-button-'+id);
+  function resetButtonText(id) {
+    var button = document.querySelector('#update-meta-description-button-' + id);
     button.innerHTML = button.getAttribute('data-original-button-text');
     button.removeAttribute('disabled');
   }
 
   httpPost(url, false, formData, function (data) {
-    var button = document.querySelector('#update-meta-description-button-'+id);
+    var button = document.querySelector('#update-meta-description-button-' + id);
     enableTextField(id);
     button.innerHTML = "Updated";
-    setTimeout(function(){
-    resetButtonText(id);
-    },1000)
+    setTimeout(function () {
+      resetButtonText(id);
+    }, 1000)
 
   }, function (data) {
     enableTextField(id);
@@ -243,35 +246,117 @@ function generateMetaDescription(id) {
     generateButton.innerHTML = originalText;
     generateButton.removeAttribute('disabled');
     enableTextField(id)
-    generateButton.innerHTML='Generated!';
-    setTimeout(function (){
+    generateButton.innerHTML = 'Generated!';
+    setTimeout(function () {
       generateButton.innerHTML = originalText;
-    },1000)
+    }, 1000)
 
   }, function (data) {
-    generateButton.innerHTML='Failed ;(';
-    setTimeout(function (){
+    generateButton.innerHTML = 'Failed ;(';
+    setTimeout(function () {
       generateButton.innerHTML = originalText;
-    },1000)
+    }, 1000)
 
   });
 }
 
-document.querySelector('.cgs-modal-bg').addEventListener('click', function(){
+document.querySelector('.cgs-modal-bg').addEventListener('click', function () {
   toggleBackground(false);
-  var modals= document.querySelectorAll('.cgs--show');
-  modals.forEach(function(item){
+  var modals = document.querySelectorAll('.cgs--show');
+  modals.forEach(function (item) {
     item.classList.remove('cgs--show');
   })
 });
 
 
-jQuery(document).ready(function () {
+function buttonStartAuditDisable(){
+  var button = document.getElementById('cgt-button-start-audit');
+  button.setAttribute('disabled','disabled');
+  button.style.opacity='0.5';
+}
+
+function buttonClearAuditDisable() {
+  var button = document.getElementById('cgt-button-clear-audit');
+  button.setAttribute('disabled','disabled');
+  button.style.opacity='0.5';
+}
+
+function buttonClearAuditEnable() {
+  var button = document.getElementById('cgt-button-clear-audit');
+  button.removeAttribute('disabled');
+  button.style.opacity='1';
+}
+
+function init(){
+  checkStatus();
+  if (chatGptSoeIdsToAudit.length===0){
+    buttonStartAuditDisable();
+  }
+  if (chatGptSoeIdsChecked.length===0){
+    buttonClearAuditDisable();
+  }
+
   jQuery('.chat-gpt-seo-table').DataTable(
    {
      "columnDefs": [
-       { "orderable": false, "targets": [3,4,5,6] }
+       {"orderable": false, "targets": [3, 4, 5, 6]}
      ]
    }
   );
+
+  jQuery('.chat-gpt-keywords-table').DataTable();
+}
+
+jQuery(document).ready(function () {
+  init();
 });
+
+
+function showKeywordPages(id) {
+  var element = document.querySelector('#cgs-keywords-links--' + id);
+  var showLink = document.querySelector('#cgs-keywords-links-show--' + id);
+  var hideLink = document.querySelector('#cgs-keywords-links-hide--' + id);
+
+  if (element) {
+    element.classList.remove('cgs--hide');
+    if (showLink) {
+      showLink.classList.add('cgs--hide');
+    }
+    if (hideLink) {
+      hideLink.classList.remove('cgs--hide');
+    }
+  }
+}
+
+function hideKeywordPages(id) {
+  var element = document.querySelector('#cgs-keywords-links--' + id);
+  var showLink = document.querySelector('#cgs-keywords-links-show--' + id);
+  var hideLink = document.querySelector('#cgs-keywords-links-hide--' + id);
+
+  if (element) {
+    element.classList.add('cgs--hide');
+    if (showLink) {
+      showLink.classList.remove('cgs--hide');
+    }
+    if (hideLink) {
+      hideLink.classList.add('cgs--hide');
+    }
+  }
+}
+
+function chatGptStartAudit(){
+  buttonStartAuditDisable();
+  buttonClearAuditDisable();
+  crawlData();
+}
+
+function chatGptClearAuditData() {
+  var url = "/wp-json/chat-gpt-seo/v1/clear-audit-data";
+  httpGet(url, null, function(){
+    window.location.reload();
+  }, function () {
+    window.location.reload();
+  });
+}
+
+

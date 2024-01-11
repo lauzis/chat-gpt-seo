@@ -6,7 +6,6 @@
 
 
 <?php
-
 $postSettings = [
     "Pages" => [
         'post_type' => 'page',
@@ -23,8 +22,10 @@ $postSettings = [
 ];
 ?>
 
-
-
+<script>
+  var chatGptSoeIdsToAudit = [];
+  var chatGptSoeIdsChecked = [];
+</script>
 
 <?php include(CHAT_GPT_SEO_PLUGIN_DIR . '/templates/sections/status.php'); ?>
 

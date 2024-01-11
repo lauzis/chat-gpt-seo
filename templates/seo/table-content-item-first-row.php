@@ -52,12 +52,25 @@ if ($report) {
     $time = date("Y-m-d H:i:s", $report['timestamp']);
 }
 
-
+$local_keywords = false;
+if ($report) {
+    $local_keywords = $report['local_keywords'] ?? false;
+}
 ?>
 
 <td>
+
+    <?php if (!$report): ?>
+        <script>
+          chatGptSoeIdsToAudit.push(<?= $id; ?>);
+        </script>
+    <?php else: ?>
+        <script>
+          chatGptSoeIdsChecked.push(<?= $id; ?>);
+        </script>
+    <?php endif; ?>
     <?= $id; ?>
-    <?php include(CHAT_GPT_SEO_PLUGIN_DIR."/templates/seo/table-content-item-second-row.php"); ?>
+    <?php include(CHAT_GPT_SEO_PLUGIN_DIR . "/templates/seo/table-content-item-second-row.php"); ?>
 </td>
 <td>
     <?= get_the_title($id); ?>
@@ -76,6 +89,10 @@ if ($report) {
     <?php edit_post_link(__('Edit page'), "", "", $id); ?>
 </td>
 
+<td>
+    <?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($local_keywords); ?>
+</td>
+
 <td><?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($report && $report['meta_title_keyword_found']); ?></td>
 <td><?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($report && $report['meta_title_duplicate'], true); ?></td>
 <td><?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($report && $report['meta_description']); ?></td>
@@ -87,7 +104,6 @@ if ($report) {
 <td><?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($report && $report['content_has_keywords']); ?></td>
 
 <td><?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($report && isset($report['img_alt_missing']) ? floor(count($report['img_alt_missing']) / $report['img_count'] * 100) : false); ?></td>
-
 
 
 <td><span><?= $time ?></span></td>

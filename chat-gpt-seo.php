@@ -14,7 +14,7 @@
 
 
 if (!defined('CHAT_GPT_SEO_VERSION')) {
-    define('CHAT_GPT_SEO_VERSION', '1.0.11');
+    define('CHAT_GPT_SEO_VERSION', '1.0.12');
 }
 
 if (!defined('CHAT_GPT_SEO_PLUGIN_DIR')) {
@@ -66,43 +66,42 @@ require(CHAT_GPT_SEO_PLUGIN_DIR . '/classes/ChatBot.php');
 
 function CHAT_GPT_SEO_init():void
 {
+
     $chatGptSeo = new \ChatGptSeo\ChatGptSeo();
     $chatGptSeo->init();
 
-    if (isset($_GET['chat-gpt-seo-test'])){
-        switch ($_GET['chat-gpt-seo-test']){
-            case 'keywords':
+    if (current_user_can('editor') || current_user_can('administrator')){
+        $id = $_GET['id'] ?? null;
 
-                ?>
-                <pre>
+        if (isset($_GET['chat-gpt-seo-test'])){
+            switch ($_GET['chat-gpt-seo-test']){
+                case 'keywords': ?>
+                    <pre>
                     <?php print_r(\ChatGptSeo\ChatGptSeoHelpers::get_keywords()); ?>
                 </pre>
 
-                <pre>
-                    <?php print_r(\ChatGptSeo\ChatGptSeoHelpers::get_keywords(5428)); ?>
+                    <pre>
+                    <?php print_r(\ChatGptSeo\ChatGptSeoHelpers::get_keywords($id)); ?>
                 </pre>
-                <?php
+                    <?php
+                    break;
+                case 'audit':
+                    if ($id){?>
+                        <pre>
+                            <?php
+                            $url = get_the_permalink($id);
+                            \ChatGptSeo\ChatGptSeoHelpers::remove_report($url);
+                        print_r(\ChatGptSeo\ChatGptSeoApi::audit_item($id));
+                        ?>
+                            </pre>
+<?php
+                    }
+                    break;
 
-                break;
+            }
+            die();
         }
-        die();
     }
-
-
-
-//    print(CHAT_GPT_SEO_PLUGIN_FILE);
-//    print("<br/>");
-//    print('plugin_action_links_' . plugin_basename(__FILE__));
-//    die();
-//
-//    add_filter( 'plugin_action_links_' . plugin_basename(__FILE__), 'add_action_links' );
-//    function add_action_links ( $links ) {
-//        $mylinks = array(
-//            '<a href="' . admin_url( 'options-general.php?page=mysettings' ) . '">Settings</a>',
-//        );
-//        return array_merge( $links, $mylinks );
-//    }
-
 
 }
 
