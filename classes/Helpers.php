@@ -503,6 +503,9 @@ class Helpers
         $report = self::get_meta($doc, $report);
 
 
+        $report = self::get_language($doc, $report);
+
+
         //remove header
         $headers = $doc->getElementsByTagName('header');
         if ($headers && count($headers) > 0) {
@@ -670,6 +673,17 @@ class Helpers
         $return_text = preg_replace('/\s+/', ' ', $return_text);
         $return_text = sanitize_title($text);
         return trim($return_text);
+    }
+
+    public static function get_language(\DOMDocument $doc, array $report): array
+    {
+        $lang = false;
+        $html = $doc->getElementsByTagName('html');
+        if ($html && isset($html[0])) {
+            $lang = $html[0]->getAttribute('lang');
+        }
+        $report['lang'] = $lang;
+        return $report;
     }
 
 

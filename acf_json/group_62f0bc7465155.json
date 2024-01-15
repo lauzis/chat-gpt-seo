@@ -42,6 +42,66 @@
             "append": ""
         },
         {
+            "key": "field_65a5130007228",
+            "label": "Assistant instructions",
+            "name": "assistant_instructions",
+            "aria-label": "",
+            "type": "textarea",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "You are a Search Engine Optimization expert. Write a meta description for the given text for SEO purposes. The summary should be a description of the article. It must be under 200 characters!!! The summary should always be written in the same language as the article itself is.",
+            "maxlength": "",
+            "rows": "",
+            "placeholder": "",
+            "new_lines": ""
+        },
+        {
+            "key": "field_65a513c3a56e8",
+            "label": "Keyword instruction",
+            "name": "assistant_keyword_instructions",
+            "aria-label": "",
+            "type": "textarea",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Take into consideration using these keywords in the meta description:",
+            "maxlength": "",
+            "rows": "",
+            "placeholder": "",
+            "new_lines": ""
+        },
+        {
+            "key": "field_65a5146fce39d",
+            "label": "Keyword instruction force",
+            "name": "assistant_keyword_instructions_force",
+            "aria-label": "",
+            "type": "textarea",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "Summary MUST include these words, phrases:",
+            "maxlength": "",
+            "rows": "",
+            "placeholder": "",
+            "new_lines": ""
+        },
+        {
             "key": "field_62f0be845f555",
             "label": "Chat Gpt Settings",
             "name": "",
@@ -57,6 +117,32 @@
             },
             "placement": "top",
             "endpoint": 0
+        },
+        {
+            "key": "field_65a50f49ea172",
+            "label": "ChatGpt version",
+            "name": "chat_gpt_seo_api_version",
+            "aria-label": "",
+            "type": "select",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "choices": {
+                "gpt-4": "GPT 4",
+                "gpt-3.5-turbo": "GPT 3.5 Turbo"
+            },
+            "default_value": "gpt-3.5-turbo",
+            "return_format": "value",
+            "multiple": 0,
+            "allow_null": 0,
+            "ui": 0,
+            "ajax": 0,
+            "placeholder": ""
         },
         {
             "key": "field_62f0be9b5f556",
@@ -245,5 +331,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1704276874
+    "modified": 1705317531
 }

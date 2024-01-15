@@ -156,10 +156,22 @@ function expandReport(id) {
   var element = document.querySelector('#cgs-more-details-' + id);
   if (element) {
     element.classList.toggle('cgs--show');
-    if (element.classList.contains('.cgs--show')) {
+    if (element.classList.contains('cgs--show')) {
       toggleBackground(true);
     } else {
+      toggleBackground(false);
+    }
+  }
+}
+
+function expandReportClose(id){
+  var element = document.querySelector('#cgs-more-details-' + id);
+  if (element) {
+    element.classList.toggle('cgs--show');
+    if (element.classList.contains('cgs--show')) {
       toggleBackground(true);
+    } else {
+      toggleBackground(false);
     }
   }
 }

@@ -17,16 +17,17 @@ class ChatGptApi
     private $endpoint_create_assistant;
     private $endpoint_create_thread;
     private $endpoint_message;
-
-
-    private $chat_gpt_version;
+    private string $chat_gpt_version;
+    private string $instructions;
+    private string $instructions_keywords;
+    private string $instructions_keywords_force;
+    private string $instructions_for_run;
 
     /**
      * ChatGptApi constructor.
      */
     public function __construct()
     {
-
         $test_mode = get_field('chat_gpt_seo_test_mode', 'option');
         $token = get_field('chat_gpt_seo_test_token', 'option');
         $version = get_field('chat_gpt_seo_api_version', 'option');
@@ -38,6 +39,10 @@ class ChatGptApi
         $this->authorization = $token;
         $this->endpoint_create_assistant = 'https://api.openai.com/v1/assistants';
         $this->endpoint_create_thread = 'https://api.openai.com/v1/threads';
+        $this->instructions = get_field('assistant_instructions', 'option') ?? 'You are a Search Engine Optimization expert. Write a meta description for the given text for SEO purposes. The summary should be a description of the article. It must be under 200 characters!!! The summary should always be written in the same language as the article itself is.';
+        $this->instructions_keywords = get_field('assistant_keyword_instructions', 'option') ?? 'Take into consideration using these keywords in the meta description:';
+        $this->instructions_keywords_force = get_field('assistant_keyword_instructions_force', 'option') ?? 'Description MUST include these words, phrases:';
+        $this->instructions_for_run = get_field('assistant_run_instructions', 'option') ?? 'Please generate the meta description in same language as provided text. It must be under 200 symbols.';
 
 
         $this->chat_gpt_version = $version ?? "gpt-4";
@@ -136,7 +141,7 @@ class ChatGptApi
      * @return string The response message
      * @throws Exception If there is an error in sending the message via cURL
      */
-    public function generate_meta_description(string $content, array $keywords, bool $forceKeywords = false): string|bool|array
+    public function generate_meta_description(string $content, array $keywords, bool $forceKeywords = false, $lang=""): string|bool|array
     {
         $debug = [];
         // Prepare data for sending
@@ -145,15 +150,15 @@ class ChatGptApi
 
         $consideration = '';
         if (count($keywords) > 0) {
-            $consideration = 'Take in consideration use these keywords in meta description:"' . implode(', ', $keywords) . '".';
+            $consideration = $this->instructions_keywords.':"' . implode(', ', $keywords) . '". Write meta description in locale : '.$lang;
 
             if ($forceKeywords) {
-                $consideration = 'Summary MUST include these words, phrases:"' . implode('", "', $keywords) . '". All of them! Even if it does not make sense!';
+                $consideration = $this->instructions_keywords_force.'"' . implode('", "', $keywords) . '". Write meta description in locale : '.$lang;;
             }
 
         }
 
-        $rules = 'You are Search Engine Optimization expert. Write meta description for given text for SEO purposes. The summary should description of the article. The summary must be under 200 characters!!! The summary should always be written in the same language as the article itself is.';
+        $rules = $this->instructions;
 
         $assistant = $this->get_assistant($rules);
         $assistant_id = $assistant['id'];
@@ -218,7 +223,7 @@ class ChatGptApi
         $url = "https://api.openai.com/v1/threads/$thread_id/runs";
         return $this->curl($url, [
             "assistant_id" => $assistant_id,
-            "instructions" => "Please generate the meta description in same language as provided text. It must be under 200 symbols. " . $consideration
+            "instructions" => $this->instructions_for_run. " "  . $consideration
         ], 'POST');
 
     }
