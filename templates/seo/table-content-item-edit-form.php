@@ -38,6 +38,10 @@ if ($report && !$report['meta_title_keyword_found']) {
 
 
 <div id="cgs-more-details-<?= $id; ?>" class="seo-more-details">
+    <div class="seo-more-info-header">
+        <a href="javascript:expandReportClose(<?= $id; ?>);">Close</a>
+    </div>
+
     <div class="seo-more-info-container">
 
         <div class="chat-gpt-seo-form">

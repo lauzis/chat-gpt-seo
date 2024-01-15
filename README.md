@@ -32,6 +32,12 @@
 - Move the default chat gpt context out to the settings page
 
 # Change log
+-- version 1.0.14 ---
+- adding options for acf, to edit instructions for chat GPT
+- adding close button/link added to the popup
+- passing locale to chatgpt
+
+
 --- version 1.0.13 ---
 - refactoring classes
 - moving from conversational api to assistant api

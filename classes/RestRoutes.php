@@ -41,8 +41,15 @@ class RestRoutes
     public static function generate_meta_description(\WP_REST_Request $request)
     {
         $id = $request->get_param('id');
+        $url = get_the_permalink($id);
         $force_keyword = (bool) $request->get_param('force-keyword');
         $content = apply_filters('the_content', get_the_content(null, false, $id));
+        $report = \SeoAudit\Helpers::get_report($url);
+        $wpml_lnag_info = apply_filters( 'wpml_post_language_details', NULL, $id );
+        $lang = $report['lang'] ?? "";
+        if ($wpml_lnag_info && $wpml_lnag_info['locale']){
+            $lang = $wpml_lnag_info['locale'];
+        }
         $data = $request->get_json_params();
 
         $keywords = [];
@@ -59,7 +66,7 @@ class RestRoutes
 
         $ChatBot = new \SeoAudit\ChatGptApi();
         // Send the message to our AI.
-        $resMessage = $ChatBot->generate_meta_description($content, $keywords,  $force_keyword);
+        $resMessage = $ChatBot->generate_meta_description($content, $keywords,  $force_keyword, $lang);
         if ($resMessage){
             return [
                 'id' => $id,
