@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Plugin Name: Chat GPT SEO
+ * Plugin Name: SEO Audit
  * Plugin URI: https://www.awave.com/
  * Description: SEO analysis for pages and posts. Generate meta description using chat-gpt.
  * Version: 1.0.11
@@ -32,7 +32,7 @@ if (!defined('CHAT_GPT_SEO_PLUGIN_FILE')) {
 
 if (!defined('CHAT_GPT_SEO_UPLOAD_DIR')) {
     $uploadDir = wp_get_upload_dir();
-    $baseDir = $uploadDir['basedir'] . '/chat-gpt-seo';
+    $baseDir = $uploadDir['basedir'] . '/seo-audit';
     if (!is_dir($baseDir) && !file_exists($baseDir)) {
         mkdir($baseDir, 0777);
     }
@@ -49,7 +49,7 @@ if (!defined('CHAT_GPT_SEO_REPORT_DIR')) {
 
 if (!defined('CHAT_GPT_SEO_UPLOAD_URL')) {
     $uploadDir = wp_get_upload_dir();
-    $baseDir = $uploadDir['baseurl'] . '/chat-gpt-seo';
+    $baseDir = $uploadDir['baseurl'] . '/seo-audit';
     define('CHAT_GPT_SEO_UPLOAD_URL', untrailingslashit($baseDir));
 }
 
@@ -59,51 +59,22 @@ if (!defined('CHAT_GPT_SEO_REPORT_URL')) {
 }
 
 
-require(CHAT_GPT_SEO_PLUGIN_DIR . '/classes/ChatGptSeoHelpers.php');
-require(CHAT_GPT_SEO_PLUGIN_DIR . '/classes/ChatGptSeoApi.php');
-require(CHAT_GPT_SEO_PLUGIN_DIR . '/classes/ChatGptSeo.php');
-require(CHAT_GPT_SEO_PLUGIN_DIR . '/classes/ChatBot.php');
+require(CHAT_GPT_SEO_PLUGIN_DIR . '/classes/Helpers.php');
+require(CHAT_GPT_SEO_PLUGIN_DIR . '/classes/Audit.php');
+require(CHAT_GPT_SEO_PLUGIN_DIR . '/classes/Init.php');
+require(CHAT_GPT_SEO_PLUGIN_DIR . '/classes/RestRoutes.php');
+require(CHAT_GPT_SEO_PLUGIN_DIR . '/classes/Tests.php');
+require(CHAT_GPT_SEO_PLUGIN_DIR . '/classes/ChatGptApi.php');
 
-function CHAT_GPT_SEO_init():void
+function seo_audit_init(): void
 {
 
-    $chatGptSeo = new \ChatGptSeo\ChatGptSeo();
+    $chatGptSeo = new \SeoAudit\Init();
     $chatGptSeo->init();
+    \SeoAudit\Tests::tests();
 
-    if (current_user_can('editor') || current_user_can('administrator')){
-        $id = $_GET['id'] ?? null;
-
-        if (isset($_GET['chat-gpt-seo-test'])){
-            switch ($_GET['chat-gpt-seo-test']){
-                case 'keywords': ?>
-                    <pre>
-                    <?php print_r(\ChatGptSeo\ChatGptSeoHelpers::get_keywords()); ?>
-                </pre>
-
-                    <pre>
-                    <?php print_r(\ChatGptSeo\ChatGptSeoHelpers::get_keywords($id)); ?>
-                </pre>
-                    <?php
-                    break;
-                case 'audit':
-                    if ($id){?>
-                        <pre>
-                            <?php
-                            $url = get_the_permalink($id);
-                            \ChatGptSeo\ChatGptSeoHelpers::remove_report($url);
-                        print_r(\ChatGptSeo\ChatGptSeoApi::audit_item($id));
-                        ?>
-                            </pre>
-<?php
-                    }
-                    break;
-
-            }
-            die();
-        }
-    }
 
 }
 
-add_action('init', 'CHAT_GPT_SEO_init');
+add_action('init', 'seo_audit_init');
 

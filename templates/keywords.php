@@ -8,7 +8,7 @@ $summary_data = [];
 $total_items = 0;
 foreach ($files as $file) {
     $full_path = CHAT_GPT_SEO_REPORT_DIR . "/" . $file;
-    $ext = \ChatGptSeo\ChatGptSeoHelpers::getFileExtension($full_path);
+    $ext = \SeoAudit\Helpers::getFileExtension($full_path);
     if ($ext === "json" && substr_count(".prev.", $full_path) == 0) {
         $total_items ++;
         $json_data = json_decode(file_get_contents($full_path), TRUE);
@@ -56,8 +56,13 @@ foreach ($files as $file) {
     } ?>
 <?php } ?>
 
+
+
 <section class="chat-gpt-keywords-audit">
 
+    <?php if(count($summary_data)===0): ?>
+    <h2>Looks like there is no data. Please run Seo audit first!</h2>
+    <?php else: ?>
     <table class="chat-gpt-keywords-table">
         <thead>
         <tr>
@@ -130,3 +135,4 @@ foreach ($files as $file) {
         </tbody>
     </table>
 </section>
+<?php endif; ?>

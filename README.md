@@ -1,5 +1,18 @@
-# Chat GPT seo
-Plugin for analysing content, and using chat gpt to generate seo meta description from content
+# Seo Audit
+- Seo Audit 
+  - Pages and posts are validated against SEO good pratices
+    - Page title
+    - Meta description
+    - H1
+    - Alt tags
+    - Other
+  - Checks if there is not duplicate page titles or and meta descriptions
+  - Possible to generate meta description (assuming site uses Yoast Seo Plugin)
+- Keyword audit
+  - Checks for keywords and if they are used exact match or phrase match
+  - SEO audit shows if keywords are used in important parts of the site
+  - Lists keywords and shows how often particular keyword is used and in witch sites
+  
 
 # What it does
 - Scans content pages (pages/posts) and validates against soe best practices
@@ -19,6 +32,11 @@ Plugin for analysing content, and using chat gpt to generate seo meta descriptio
 - Move the default chat gpt context out to the settings page
 
 # Change log
+--- version 1.0.13 ---
+- refactoring classes
+- moving from conversational api to assistant api
+- some code cleanup
+
 --- version 1.0.12 ---
 - some refactoring
 - added buttons for clearing all the cashed audit data

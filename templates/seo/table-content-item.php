@@ -9,9 +9,9 @@ if (empty($id)){
     <?php
 }
 $url = get_the_permalink($id);
-$report = \ChatGptSeo\ChatGptSeoHelpers::get_report($url);
-$report_url = \ChatGptSeo\ChatGptSeoHelpers::get_report_url($url);
-$report_html_url = \ChatGptSeo\ChatGptSeoHelpers::get_report_html_url($url);
+$report = \SeoAudit\Helpers::get_report($url);
+$report_url = \SeoAudit\Helpers::get_report_url($url);
+$report_html_url = \SeoAudit\Helpers::get_report_html_url($url);
 ?>
 
 <tr data-id="<?= $id ?>" id="seo-summary-<?= $id ?>" class="<?= $report ? 'chat-gpt-seo-report-done' : 'chat-gpt-seo-check-post' ?>">

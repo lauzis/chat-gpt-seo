@@ -1,8 +1,8 @@
-if (!chatGptSoeIdsChecked){
+if (!chatGptSoeIdsChecked) {
   var chatGptSoeIdsChecked = [];
 }
 
-if (!chatGptSoeIdsToAudit){
+if (!chatGptSoeIdsToAudit) {
   var chatGptSoeIdsToAudit = [];
 }
 
@@ -24,7 +24,7 @@ function httpPost(url, headers, data, callback, failCallBack) {
   };
   xmlhttp.open("POST", url, true);
   xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-  xmlhttp.setRequestHeader('X-WP-Nonce', icl_vars.restNonce );
+  xmlhttp.setRequestHeader('X-WP-Nonce', icl_vars.restNonce);
   if (headers && headers.headers) {
     for (const key of Object.keys(headers.headers)) {
       xmlhttp.setRequestHeader(key, headers.headers[key]);
@@ -64,7 +64,7 @@ function httpGet(url, headers, callback, failCallBack) {
 
   xmlhttp.open("GET", url, true);
   xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-  xmlhttp.setRequestHeader('X-WP-Nonce', icl_vars.restNonce  );
+  xmlhttp.setRequestHeader('X-WP-Nonce', icl_vars.restNonce);
   if (headers && headers.headers) {
     for (const headersKey of Object.keys(headers.headers)) {
       xmlhttp.setRequestHeader(headersKey, headers.headers[headersKey]);
@@ -84,8 +84,10 @@ function checkStatus() {
     buttonClearAuditEnable();
   }
   var statusElement = document.querySelector('.chat-gpt-seo-status');
-  statusElement.style.width = percents + "%";
-  statusElement.innerHTML = checked_count+" / " + total +" ( "+ percents+"% )";
+  if (statusElement) {
+    statusElement.style.width = percents + "%";
+    statusElement.innerHTML = checked_count + " / " + total + " ( " + percents + "% )";
+  }
 }
 
 function crawlData(passId) {
@@ -107,9 +109,9 @@ function crawlData(passId) {
     force = true;
   }
 
-  var url = "/wp-json/chat-gpt-seo/v1/audit-item/" + id;
+  var url = "/wp-json/seo-audit/v1/audit-item/" + id;
   if (force) {
-    url = "/wp-json/chat-gpt-seo/v1/force-audit-item/" + id;
+    url = "/wp-json/seo-audit/v1/force-audit-item/" + id;
   }
 
   var status = document.querySelector('#penalty-' + id);
@@ -200,31 +202,41 @@ function enableTextField(id) {
 
 function updateMetaDescription(id) {
   var formData = getFormDate(id);
-  var url = "/wp-json/chat-gpt-seo/v1/update-meta-description/" + id;
+  var url = "/wp-json/seo-audit/v1/update-meta-description/" + id;
 
   disableTextField(id);
 
   var button = document.querySelector('#update-meta-description-button-' + id);
-  button.innerHTML = "Updating..."
-  button.setAttribute('disabled', 'disabled');
+  if (button) {
+    button.innerHTML = "Updating..."
+    button.setAttribute('disabled', 'disabled');
+  }
+
 
   function resetButtonText(id) {
     var button = document.querySelector('#update-meta-description-button-' + id);
-    button.innerHTML = button.getAttribute('data-original-button-text');
-    button.removeAttribute('disabled');
+    if (button) {
+      button.innerHTML = button.getAttribute('data-original-button-text');
+      button.removeAttribute('disabled');
+    }
   }
 
   httpPost(url, false, formData, function (data) {
     var button = document.querySelector('#update-meta-description-button-' + id);
-    enableTextField(id);
-    button.innerHTML = "Updated";
-    setTimeout(function () {
-      resetButtonText(id);
-    }, 1000)
+    if (button){
+      enableTextField(id);
+      button.innerHTML = "Updated";
+      setTimeout(function () {
+        resetButtonText(id);
+      }, 1000);
+    }
+
 
   }, function (data) {
     enableTextField(id);
-    button.innerHTML = "Failed :(";
+    if (button){
+      button.innerHTML = "Failed :(";
+    }
     resetButtonText(id);
   });
 }
@@ -234,7 +246,7 @@ function generateMetaDescription(id) {
   var originalText = generateButton.innerHTML;
   generateButton.innerHTML = "Generating...";
   var formData = getFormDate(id);
-  var url = "/wp-json/chat-gpt-seo/v1/generate-meta-description/" + id;
+  var url = "/wp-json/seo-audit/v1/generate-meta-description/" + id;
   generateButton.setAttribute('disabled', 'disabled');
 
   disableTextField(id);
@@ -260,39 +272,49 @@ function generateMetaDescription(id) {
   });
 }
 
-document.querySelector('.cgs-modal-bg').addEventListener('click', function () {
-  toggleBackground(false);
-  var modals = document.querySelectorAll('.cgs--show');
-  modals.forEach(function (item) {
-    item.classList.remove('cgs--show');
-  })
-});
+var modalBg = document.querySelector('.cgs-modal-bg');
+if (modalBg) {
+  document.querySelector('.cgs-modal-bg').addEventListener('click', function () {
+    toggleBackground(false);
+    var modals = document.querySelectorAll('.cgs--show');
+    modals.forEach(function (item) {
+      item.classList.remove('cgs--show');
+    })
+  });
+}
 
 
-function buttonStartAuditDisable(){
+function buttonStartAuditDisable() {
   var button = document.getElementById('cgt-button-start-audit');
-  button.setAttribute('disabled','disabled');
-  button.style.opacity='0.5';
+  if (button){
+    button.setAttribute('disabled', 'disabled');
+    button.style.opacity = '0.5';
+  }
+
 }
 
 function buttonClearAuditDisable() {
   var button = document.getElementById('cgt-button-clear-audit');
-  button.setAttribute('disabled','disabled');
-  button.style.opacity='0.5';
+  if (button){
+    button.setAttribute('disabled', 'disabled');
+    button.style.opacity = '0.5';
+  }
 }
 
 function buttonClearAuditEnable() {
   var button = document.getElementById('cgt-button-clear-audit');
-  button.removeAttribute('disabled');
-  button.style.opacity='1';
+  if (button) {
+    button.removeAttribute('disabled');
+    button.style.opacity = '1';
+  }
 }
 
-function init(){
+function init() {
   checkStatus();
-  if (chatGptSoeIdsToAudit.length===0){
+  if (chatGptSoeIdsToAudit.length === 0) {
     buttonStartAuditDisable();
   }
-  if (chatGptSoeIdsChecked.length===0){
+  if (chatGptSoeIdsChecked.length === 0) {
     buttonClearAuditDisable();
   }
 
@@ -304,6 +326,7 @@ function init(){
    }
   );
 
+  console.log("lets set the tables...... ", jQuery('.chat-gpt-keywords-table'));
   jQuery('.chat-gpt-keywords-table').DataTable();
 }
 
@@ -344,15 +367,15 @@ function hideKeywordPages(id) {
   }
 }
 
-function chatGptStartAudit(){
+function chatGptStartAudit() {
   buttonStartAuditDisable();
   buttonClearAuditDisable();
   crawlData();
 }
 
 function chatGptClearAuditData() {
-  var url = "/wp-json/chat-gpt-seo/v1/clear-audit-data";
-  httpGet(url, null, function(){
+  var url = "/wp-json/seo-audit/v1/clear-audit-data";
+  httpGet(url, null, function () {
     window.location.reload();
   }, function () {
     window.location.reload();

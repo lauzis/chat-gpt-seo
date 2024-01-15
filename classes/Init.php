@@ -1,24 +1,17 @@
 <?php
 
-namespace ChatGptSeo;
+namespace SeoAudit;
 
-
-const LimeResyncThreshold = (60 * 30);
-//treshold for retry, if fails sync (lime is not responsive or something)
-//we will retry same object after hour.
-
-
-class ChatGptSeo
+class Init
 {
     public function init(): void
     {
         if (is_admin()) {
             $this->add_options_page();
-            add_action('admin_menu', [$this, 'add_chat_gpt_seo_log_page']);
+            add_action('admin_menu', [$this, 'add_menu_links']);
         }
         $this->setup_hooks();
         $this->setup_api_routes();
-
 
     }
 
@@ -43,9 +36,9 @@ class ChatGptSeo
     {
 
         add_action('rest_api_init', function () {
-            register_rest_route('chat-gpt-seo/v1', '/audit-item/(?P<id>\d+)', array(
+            register_rest_route('seo-audit/v1', '/audit-item/(?P<id>\d+)', array(
                 'methods' => 'GET',
-                'callback' => 'ChatGptSeo\ChatGptSeoApi::audit_item_request',
+                'callback' => 'SeoAudit\RestRoutes::audit_item_request',
                 'args' => array(
                     'id' => array(
                         'validate_callback' => function ($param, $request, $key) {
@@ -58,9 +51,9 @@ class ChatGptSeo
                 }
             ));
 
-            register_rest_route('chat-gpt-seo/v1', '/force-audit-item/(?P<id>\d+)', array(
+            register_rest_route('seo-audit/v1', '/force-audit-item/(?P<id>\d+)', array(
                 'methods' => 'GET',
-                'callback' => 'ChatGptSeo\ChatGptSeoApi::force_audit_item_request',
+                'callback' => 'SeoAudit\RestRoutes::force_audit_item_request',
                 'args' => array(
                     'id' => array(
                         'validate_callback' => function ($param, $request, $key) {
@@ -73,17 +66,17 @@ class ChatGptSeo
                 }
             ));
 
-            register_rest_route('chat-gpt-seo/v1', '/clear-audit-data', array(
+            register_rest_route('seo-audit/v1', '/clear-audit-data', array(
                 'methods' => 'GET',
-                'callback' => 'ChatGptSeo\ChatGptSeoApi::clear_audit_data',
+                'callback' => 'SeoAudit\RestRoutes::clear_audit_data',
                 'permission_callback' => function () {
                     return current_user_can('edit_others_posts');
                 }
             ));
 
-            register_rest_route('chat-gpt-seo/v1', '/update-meta-description/(?P<id>\d+)', array(
+            register_rest_route('seo-audit/v1', '/update-meta-description/(?P<id>\d+)', array(
                 'methods' => 'POST',
-                'callback' => 'ChatGptSeo\ChatGptSeoApi::update_meta_description',
+                'callback' => 'SeoAudit\RestRoutes::update_meta_description',
                 'args' => array(
                     'id' => array(
                         'validate_callback' => function ($param, $request, $key) {
@@ -97,9 +90,9 @@ class ChatGptSeo
             ));
 
 
-            register_rest_route('chat-gpt-seo/v1', '/generate-meta-description/(?P<id>\d+)', array(
+            register_rest_route('seo-audit/v1', '/generate-meta-description/(?P<id>\d+)', array(
                 'methods' => 'POST',
-                'callback' => 'ChatGptSeo\ChatGptSeoApi::generate_meta_description',
+                'callback' => 'SeoAudit\RestRoutes::generate_meta_description',
                 'args' => array(
                     'id' => array(
                         'validate_callback' => function ($param, $request, $key) {
@@ -141,8 +134,6 @@ class ChatGptSeo
     {
         wp_enqueue_style('chat-gpt-seo-css', CHAT_GPT_SEO_PLUGIN_URL . '/assets/css/main.css');
         wp_enqueue_style('chat-gpt-seo-lib-table-styles', CHAT_GPT_SEO_PLUGIN_URL . '/assets/lib/jquery.dataTables.css');
-
-
     }
 
     public function enqueue_plugin_scripts(): void
@@ -153,14 +144,14 @@ class ChatGptSeo
 
     }
 
-    public function add_chat_gpt_seo_log_page(): void
+    public function add_menu_links(): void
     {
         add_menu_page(
             'SEO Audit',
             'SEO Audit',
             'manage_options',
             'chat-gpt-seo-audit',
-            [$this, 'seo_audit'],//'ChatGptSeo\ChatGptSeo::seo_audit',
+            [$this, 'seo_audit'],//'Init\Init::seo_audit',
             'dashicons-chart-bar', // You can change the icon
             85 // Adjust the position as needed
         );
@@ -217,25 +208,5 @@ class ChatGptSeo
             $field_group = json_decode(file_get_contents(CHAT_GPT_SEO_PLUGIN_DIR . '/acf_json/group_65536c2771900.json'), TRUE);
             acf_add_local_field_group($field_group);
         }
-    }
-
-    private function get_api_settings(): array
-    {
-        $test_mode = get_field('chat_gpt_seo_test_mode', 'option');
-        $token = get_field('chat_gpt_seo_test_token', 'option');
-    }
-
-
-    function log($text): void
-    {
-        $logger = new ChatGptSeoLog();
-        $log_data = [
-            'timestamp' => time(),
-            'time' => date("Y-m-d H:i:s"),
-            'chat_got_seo_object' => json_encode($text, JSON_PRETTY_PRINT),
-            'log' => $text,
-            'post_data' => $text
-        ];
-        $logger->log($log_data);
     }
 }

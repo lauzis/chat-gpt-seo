@@ -1,11 +1,11 @@
 <?php
 
-namespace ChatGptSeo;
+namespace SeoAudit;
 
 const KEYWORD_FOUND_PHRASE = 2;
 const KEYWORD_FOUND_EXACT_MATCH = 1;
 
-class ChatGptSeoHelpers
+class Helpers
 {
     static array $keywords = [];
     static bool $initialized = false;
@@ -49,13 +49,13 @@ class ChatGptSeoHelpers
         $full_list_of_keywords = [];
         if ($id !== 'option') {
             $full_list_of_keywords = self::get_keywords_arr($id);
-            if (!empty($full_list_of_keywords)){
+            if (!empty($full_list_of_keywords)) {
                 self::$local_keywords = true;
             } else {
                 self::$local_keywords = false;
             }
         }
-        if (empty($full_list_of_keywords)){
+        if (empty($full_list_of_keywords)) {
             $full_list_of_keywords = !empty(self::$keywords) ? self::$keywords : self::get_keywords_arr();
         }
         self::$keywords = $full_list_of_keywords;
@@ -120,7 +120,7 @@ class ChatGptSeoHelpers
             $textMissing = true;
         } else {
 
-            $result = \ChatGptSeo\ChatGptSeoHelpers::has_keywords($text, 'in_content');
+            $result = \SeoAudit\Helpers::has_keywords($text, 'in_content');
             if ($result) {
                 return $result;
             } else {
@@ -325,8 +325,8 @@ class ChatGptSeoHelpers
         $file_json = CHAT_GPT_SEO_REPORT_DIR . "/" . self::generate_file_name($url) . ".json";
         $file_html_prev = CHAT_GPT_SEO_REPORT_DIR . "/" . self::generate_file_name($url) . ".prev.html";
         $file_json_prev = CHAT_GPT_SEO_REPORT_DIR . "/" . self::generate_file_name($url) . ".prev.json";
-        file_put_contents($file_html_prev,file_get_contents($file_html));
-        file_put_contents($file_json_prev,file_get_contents($file_json));
+        file_put_contents($file_html_prev, file_get_contents($file_html));
+        file_put_contents($file_json_prev, file_get_contents($file_json));
 
         if (file_exists($file_html)) {
             unlink($file_html);
@@ -605,17 +605,10 @@ class ChatGptSeoHelpers
         return strip_tags($text);
     }
 
-    private static function string_to_id($text)
-    {
-        $return_text = strip_tags($text);
-        $return_text = preg_replace('/\s+/', ' ', $return_text);
-        $return_text = sanitize_title($text);
-        return trim($return_text);
-    }
 
     public static function meta_description_is_unique(int $id, string $meta_field_content): bool
     {
-        $description = self::string_to_id($meta_field_content);
+        $description = \SeoAudit\Helpers::string_to_id($meta_field_content);
 
         $all_descriptions = self::get_all_fields('meta_description_text');
 
@@ -640,7 +633,7 @@ class ChatGptSeoHelpers
 
                 $report = json_decode(file_get_contents($full_path), TRUE);
                 if (isset($report[$field])) {
-                    $field_value = self::string_to_id($report[$field]);
+                    $field_value = \SeoAudit\Helpers::string_to_id($report[$field]);
                     $id = (int)$report['id'];
                     if (!isset($data[$field_value])) {
                         $data[$field_value] = [];
@@ -654,7 +647,7 @@ class ChatGptSeoHelpers
 
     private static function meta_title_is_unique(int $id, string $meta_title): bool
     {
-        $title = self::string_to_id($meta_title);
+        $title = \SeoAudit\Helpers::string_to_id($meta_title);
         $all_meta_titles = self::get_all_fields('meta_title_text');
         $current_meta_title = $all_meta_titles[$title] ?? [];
         if (count($current_meta_title) > 1 || count($current_meta_title) == 1 && !in_array($id, $current_meta_title)) {
@@ -663,12 +656,21 @@ class ChatGptSeoHelpers
         return false;
     }
 
-    public static function getFileExtension($file){
+    public static function getFileExtension($file)
+    {
         $ext = explode(".", $file);
         $ext = end($ext);
         return $ext;
     }
 
+
+    public static function string_to_id($text)
+    {
+        $return_text = strip_tags($text);
+        $return_text = preg_replace('/\s+/', ' ', $return_text);
+        $return_text = sanitize_title($text);
+        return trim($return_text);
+    }
 
 
 }

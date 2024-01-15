@@ -66,6 +66,7 @@ ul.soe-chat-gpt-keyword-list li {
     z-index: 9992;
     overflow-y: auto;
     border-radius: 6px;
+    text-align: left;
 
 }
 

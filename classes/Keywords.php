@@ -1,8 +1,8 @@
 <?php
 
-namespace ChatGptSeo;
+namespace SeoAudit;
 
-class ChatGptSeoApi
+class Keywords
 {
 
     private function get_api_settings():array
@@ -18,7 +18,7 @@ class ChatGptSeoApi
     }
 
 
-    public static function force_audit_item_request(\WP_REST_Request $request):array
+    public static function force_audit_item(\WP_REST_Request $request)
     {
         $id = $request->get_param('id');
         $url = get_the_permalink($id);
@@ -27,35 +27,29 @@ class ChatGptSeoApi
             wpfc_clear_post_cache_by_id($id);
         }
 
-        \ChatGptSeo\ChatGptSeoHelpers::remove_report($url);
-        return self::audit_item_request($request);
+        \SeoAudit\Helpers::remove_report($url);
+        return self::audit_item($request);
     }
 
-
-    public static function audit_item_request(\WP_REST_Request $request):array{
-        $id = $request->get_param('id');
-        return self::audit_item($id);
-    }
-    public static function audit_item(string  $id):array
+    public static function audit_item(\WP_REST_Request $request)
     {
 
-
+        $id = $request->get_param('id');
         $url = get_the_permalink($id);
-        $keywords = \ChatGptSeo\ChatGptSeoHelpers::get_keywords($id);
+        $keywords = \SeoAudit\Helpers::get_keywords($id);
 
         $report = [
             'status' => 0,
             'url' => $url,
             'id' => $id,
             'timestamp' => time(),
-            'keywords' => $keywords,
-            'local_keywords' => \ChatGptSeo\ChatGptSeoHelpers::$local_keywords
+            'keywords' => $keywords
         ];
 
 
         $fromFile = false;
-        $html_from_file = \ChatGptSeo\ChatGptSeoHelpers::get_html_from_file($url);
-        $report_from_file = \ChatGptSeo\ChatGptSeoHelpers::get_report($url);
+        $html_from_file = \SeoAudit\Helpers::get_html_from_file($url);
+        $report_from_file = \SeoAudit\Helpers::get_report($url);
 
         if (!empty($html_from_file) && !empty($report_from_file)) {
             $fromFile = true;
@@ -67,7 +61,7 @@ class ChatGptSeoApi
                 sleep($sleepTimer);
             }
 
-            $result = \ChatGptSeo\ChatGptSeoHelpers::get_HTML($url);
+            $result = \SeoAudit\Helpers::get_HTML($url);
             $html = $result['content'];
             $report['status']= $result['status'];
 
@@ -79,19 +73,19 @@ class ChatGptSeoApi
             $reports['status'] = $status;
 
             if (!empty($html)) {
-                \ChatGptSeo\ChatGptSeoHelpers::save_html_to_file($url, $html);
+                \SeoAudit\Helpers::save_html_to_file($url, $html);
             }
 
-            $report = \ChatGptSeo\ChatGptSeoHelpers::audit_html($html, $report);
-            $report['keywords'] = \ChatGptSeo\ChatGptSeoHelpers::$keywords;
+            $report = \SeoAudit\Helpers::audit_html($html, $report);
+            $report['keywords'] = \SeoAudit\Helpers::$keywords;
 
 
 
 
-            \ChatGptSeo\ChatGptSeoHelpers::save_report($url, $report);
+            \SeoAudit\Helpers::save_report($url, $report);
         }
 
-        $html = \ChatGptSeo\ChatGptSeoHelpers::get_raport_item_output_html($id, $fromFile);
+        $html = \SeoAudit\Helpers::get_raport_item_output_html($id, $fromFile);
         return [
             'html' => $html,
             'report' => $report,
@@ -132,11 +126,11 @@ class ChatGptSeoApi
 
 
 
-        $content = \ChatGptSeo\ChatGptSeoHelpers::clean_html($content);
+        $content = \SeoAudit\Helpers::clean_html($content);
 
 
 
-        $ChatBot = new \ChatGptSeo\ChatBot();
+        $ChatBot = new SeoAudit\ChatBot();
         // Send the message to our AI.
         $resMessage = $ChatBot->sendMessage($content, $keywords,  $force_keyword);
         if ($resMessage){
@@ -160,14 +154,5 @@ class ChatGptSeoApi
         ];
 
 
-    }
-
-    public static function clear_audit_data() {
-        $files = scandir(CHAT_GPT_SEO_REPORT_DIR);
-        foreach($files as $file){
-            if ($file!=='.' && $file!=='..'){
-                unlink(CHAT_GPT_SEO_REPORT_DIR."/".$file);
-            }
-        }
     }
 }

@@ -9,9 +9,9 @@ if (empty($id)) {
     <?php
 }
 $url = get_the_permalink($id);
-$report = \ChatGptSeo\ChatGptSeoHelpers::get_report($url);
-$report_url = \ChatGptSeo\ChatGptSeoHelpers::get_report_url($url);
-$report_html_url = \ChatGptSeo\ChatGptSeoHelpers::get_report_html_url($url);
+$report = \SeoAudit\Helpers::get_report($url);
+$report_url = \SeoAudit\Helpers::get_report_url($url);
+$report_html_url = \SeoAudit\Helpers::get_report_html_url($url);
 $penalty = $report ? 0 : "not analysed yet";
 
 
@@ -70,7 +70,7 @@ if ($report) {
         </script>
     <?php endif; ?>
     <?= $id; ?>
-    <?php include(CHAT_GPT_SEO_PLUGIN_DIR . "/templates/seo/table-content-item-second-row.php"); ?>
+    <?php include(CHAT_GPT_SEO_PLUGIN_DIR . "/templates/seo/table-content-item-edit-form.php"); ?>
 </td>
 <td>
     <?= get_the_title($id); ?>
@@ -90,20 +90,20 @@ if ($report) {
 </td>
 
 <td>
-    <?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($local_keywords); ?>
+    <?php \SeoAudit\Helpers::get_audit_status($local_keywords); ?>
 </td>
 
-<td><?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($report && $report['meta_title_keyword_found']); ?></td>
-<td><?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($report && $report['meta_title_duplicate'], true); ?></td>
-<td><?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($report && $report['meta_description']); ?></td>
-<td><?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($report && $report['meta_description_keyword_found']); ?></td>
-<td><?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($report && $report['meta_description_duplicate'], true); ?></td>
-<td><?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($report && $report['h1_count'] > 0); ?></td>
-<td><?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($report && $report['h1_found_keyword'] > 0); ?></td>
-<td><?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($report && $report['first_paragraph_found_keywords']); ?></td>
-<td><?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($report && $report['content_has_keywords']); ?></td>
+<td><?php \SeoAudit\Helpers::get_audit_status($report && $report['meta_title_keyword_found']); ?></td>
+<td><?php \SeoAudit\Helpers::get_audit_status($report && $report['meta_title_duplicate'], true); ?></td>
+<td><?php \SeoAudit\Helpers::get_audit_status($report && $report['meta_description']); ?></td>
+<td><?php \SeoAudit\Helpers::get_audit_status($report && $report['meta_description_keyword_found']); ?></td>
+<td><?php \SeoAudit\Helpers::get_audit_status($report && $report['meta_description_duplicate'], true); ?></td>
+<td><?php \SeoAudit\Helpers::get_audit_status($report && $report['h1_count'] > 0); ?></td>
+<td><?php \SeoAudit\Helpers::get_audit_status($report && $report['h1_found_keyword'] > 0); ?></td>
+<td><?php \SeoAudit\Helpers::get_audit_status($report && $report['first_paragraph_found_keywords']); ?></td>
+<td><?php \SeoAudit\Helpers::get_audit_status($report && $report['content_has_keywords']); ?></td>
 
-<td><?php \ChatGptSeo\ChatGptSeoHelpers::get_audit_status($report && isset($report['img_alt_missing']) ? floor(count($report['img_alt_missing']) / $report['img_count'] * 100) : false); ?></td>
+<td><?php \SeoAudit\Helpers::get_audit_status($report && isset($report['img_alt_missing']) ? floor(count($report['img_alt_missing']) / $report['img_count'] * 100) : false); ?></td>
 
 
 <td><span><?= $time ?></span></td>
