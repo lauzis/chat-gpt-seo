@@ -1,13 +1,13 @@
 # Seo Audit
 - Seo Audit 
-  - Pages and posts are validated against SEO good pratices
+  - Pages and posts are validated against SEO good practices
     - Page title
     - Meta description
     - H1
     - Alt tags
     - Other
   - Checks if there is not duplicate page titles or and meta descriptions
-  - Possible to generate meta description (assuming site uses Yoast Seo Plugin)
+  - Possible to generate meta description via (chatGPT) (assuming site uses Yoast Seo Plugin)
 - Keyword audit
   - Checks for keywords and if they are used exact match or phrase match
   - SEO audit shows if keywords are used in important parts of the site
