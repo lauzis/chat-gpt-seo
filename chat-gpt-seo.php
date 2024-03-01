@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Plugin Name: SEO Audit
  * Plugin URI: https://www.awave.com/
@@ -11,7 +10,6 @@
  * Modifying, copying, distributing or selling
  * this software is prohibited without written permission.
  */
-
 
 if (!defined('CHAT_GPT_SEO_VERSION')) {
     define('CHAT_GPT_SEO_VERSION', '1.0.12');
@@ -27,7 +25,6 @@ if (!defined('CHAT_GPT_SEO_PLUGIN_URL')) {
 
 if (!defined('CHAT_GPT_SEO_PLUGIN_FILE')) {
     define('CHAT_GPT_SEO_PLUGIN_FILE', plugin_basename(__FILE__));
-
 }
 
 if (!defined('CHAT_GPT_SEO_UPLOAD_DIR')) {
@@ -58,7 +55,6 @@ if (!defined('CHAT_GPT_SEO_REPORT_URL')) {
     define('CHAT_GPT_SEO_REPORT_URL', $url);
 }
 
-
 require(CHAT_GPT_SEO_PLUGIN_DIR . '/classes/Helpers.php');
 require(CHAT_GPT_SEO_PLUGIN_DIR . '/classes/Audit.php');
 require(CHAT_GPT_SEO_PLUGIN_DIR . '/classes/Init.php');
@@ -68,12 +64,9 @@ require(CHAT_GPT_SEO_PLUGIN_DIR . '/classes/ChatGptApi.php');
 
 function seo_audit_init(): void
 {
-
     $chatGptSeo = new \SeoAudit\Init();
     $chatGptSeo->init();
     \SeoAudit\Tests::tests();
-
-
 }
 
 add_action('init', 'seo_audit_init');
