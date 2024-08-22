@@ -24,7 +24,8 @@ function httpPost(url, headers, data, callback, failCallBack) {
   };
   xmlhttp.open("POST", url, true);
   xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-  xmlhttp.setRequestHeader('X-WP-Nonce', icl_vars.restNonce);
+  console.log(chatGptSeoNonce.chatGptSeoNonce);
+  xmlhttp.setRequestHeader('X-WP-Nonce', chatGptSeoNonce.chatGptSeoNonce);
   if (headers && headers.headers) {
     for (const key of Object.keys(headers.headers)) {
       xmlhttp.setRequestHeader(key, headers.headers[key]);
@@ -64,7 +65,8 @@ function httpGet(url, headers, callback, failCallBack) {
 
   xmlhttp.open("GET", url, true);
   xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-  xmlhttp.setRequestHeader('X-WP-Nonce', icl_vars.restNonce);
+  console.log(chatGptSeoNonce.chatGptSeoNonce);
+  xmlhttp.setRequestHeader('X-WP-Nonce', chatGptSeoNonce.chatGptSeoNonce);
   if (headers && headers.headers) {
     for (const headersKey of Object.keys(headers.headers)) {
       xmlhttp.setRequestHeader(headersKey, headers.headers[headersKey]);
