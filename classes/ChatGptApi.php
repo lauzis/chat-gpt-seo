@@ -75,7 +75,6 @@ class ChatGptApi
         }
     }
 
-
     private function curl($request_url, array|bool $data = false, $request_type = 'GET'): array|bool
     {
         // Set headers for the API request
@@ -141,7 +140,7 @@ class ChatGptApi
      * @return string The response message
      * @throws Exception If there is an error in sending the message via cURL
      */
-    public function generate_meta_description(string $content, array $keywords, bool $forceKeywords = false, $lang=""): string|bool|array
+    public function generate_meta_description(string $content, array $keywords, bool $forceKeywords = false, $lang = ""): string|bool|array
     {
         $debug = [];
         // Prepare data for sending
@@ -150,12 +149,11 @@ class ChatGptApi
 
         $consideration = '';
         if (count($keywords) > 0) {
-            $consideration = $this->instructions_keywords.':"' . implode(', ', $keywords) . '". Write meta description in locale : '.$lang;
+            $consideration = $this->instructions_keywords . ':"' . implode(', ', $keywords) . '". Write meta description in locale : ' . $lang;
 
             if ($forceKeywords) {
-                $consideration = $this->instructions_keywords_force.'"' . implode('", "', $keywords) . '". Write meta description in locale : '.$lang;;
+                $consideration = $this->instructions_keywords_force . '"' . implode('", "', $keywords) . '". Write meta description in locale : ' . $lang;;
             }
-
         }
 
         $rules = $this->instructions;
@@ -167,8 +165,6 @@ class ChatGptApi
         $debug['rules'] = $rules;
         $debug['consideration'] = $consideration;
         $debug['keywords'] = $keywords;
-
-
 
         if ($assistant) {
             if ($assistant_id) {
@@ -206,7 +202,7 @@ class ChatGptApi
 
                     if ($status === 'completed') {
                         $thread_list = $this->get_thread_list($thread_id);
-                        $debug['thread_requests'][$counter+1] = $thread_list;
+                        $debug['thread_requests'][$counter + 1] = $thread_list;
                         $message = $this->get_last_assistant_resposne($thread_list);
                     }
 
@@ -215,6 +211,8 @@ class ChatGptApi
                 return false;
             }
         }
+
+        return false;
     }
 
     private function create_run($thread_id, $assistant_id, $consideration)
@@ -223,7 +221,7 @@ class ChatGptApi
         $url = "https://api.openai.com/v1/threads/$thread_id/runs";
         return $this->curl($url, [
             "assistant_id" => $assistant_id,
-            "instructions" => $this->instructions_for_run. " "  . $consideration
+            "instructions" => $this->instructions_for_run . " " . $consideration
         ], 'POST');
 
     }
