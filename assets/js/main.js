@@ -111,7 +111,7 @@ function crawlData(passId) {
     force = true;
   }
 
-  var url = "/wp-json/seo-audit/v1/audit-item/" + id;
+  var url = "/wp-json/fummailv1/audit-item/" + id;
   if (force) {
     url = "/wp-json/seo-audit/v1/force-audit-item/" + id;
   }
