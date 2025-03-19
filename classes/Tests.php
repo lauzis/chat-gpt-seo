@@ -2,44 +2,84 @@
 
 namespace SeoAudit;
 
-use function SeoAudit\get_field;
-use function SeoAudit\get_the_permalink;
+use SeoAudit\ChatBot;
+use SeoAudit\ChatGptApi;
 
 class Tests
 {
-    public static function tests(){
-        if (current_user_can('editor') || current_user_can('administrator')) {
-            $id = $_GET['id'] ?? null;
-
-            if (isset($_GET['chat-gpt-seo-test'])) {
-                switch ($_GET['chat-gpt-seo-test']) {
-                    case 'keywords': ?>
-                        <pre>
-                    <?php print_r(\SeoAudit\Helpers::get_keywords()); ?>
-                </pre>
-
-                        <pre>
-                    <?php print_r(\SeoAudit\Helpers::get_keywords($id)); ?>
-                </pre>
-                        <?php
-                        break;
-                    case 'audit':
-                        if ($id) {
-                            ?>
-                            <pre>
-                            <?php
-                            $url = get_the_permalink($id);
-                            \SeoAudit\Helpers::remove_report($url);
-                            print_r(\SeoAudit\SeoAuditApi::audit_item($id));
-                            ?>
-                            </pre>
-                            <?php
-                        }
-                        break;
-
-                }
-                die();
-            }
+    public static $asistantInstructions = "You are the Dad, who likes dad jokes";
+    public static $assistantName = "Dad Jo";
+    public static $assistantId = "dad-jo";
+    public static function TestApiRequest()
+    {
+        $ChatBot = new ChatBot();
+        $response = $ChatBot->sendMessage('DO i need threads and create assistant to make requests?', [], true); ?>
+        <p><?= $response ?></p>
+        <?php
+        if ($response) {
+            echo 'Test passed';
+        } else {
+            echo 'Test failed';
         }
     }
+
+    public static function TestCreateAssistant()
+    {
+        $ChatBotApi = new ChatGptApi();
+
+        $assistantName = self::$assistantName;
+        $instructions = self::$asistantInstructions;
+        $assistantId = self::$assistantId;
+
+        $response = $ChatBotApi->create_assistant($assistantId, $instructions, $assistantName);
+        $responseJson = \SeoAudit\Helpers::get_json($assistantId);
+
+        ?>
+        <p><?= json_encode($responseJson, JSON_PRETTY_PRINT) ?></p>
+        <?php
+        if ($response) {
+            echo 'Test passed';
+        } else {
+            echo 'Test failed';
+        }
+    }
+
+    public static function TestGetAssistant()
+    {
+        $ChatBotApi = new ChatGptApi();
+
+        //TODO why we are getting this by instructions?
+        $assistant = $ChatBotApi->get_assistant(self::$asistantInstructions);
+
+        if ($assistant) {
+            echo 'Test passed';
+            ?>
+            <p><?= json_encode($assistant, JSON_PRETTY_PRINT) ?></p>
+            <?php
+        } else {
+            echo 'Test failed';
+        }
+    }
+
+    public static function TestCreateThread() {
+            $ChatBotApi = new ChatGptApi();
+            $response = $ChatBotApi->create_thread();
+            if ($response) {
+                echo 'Test passed';
+            } else {
+                echo 'Test failed';
+            }
+    }
+
+
+    public static function TestGetThread() {
+        $ChatBotApi = new ChatGptApi();
+        $response = $ChatBotApi->get_thread();
+        if ($response) {
+            echo 'Test passed';
+        } else {
+            echo 'Test failed';
+        }
+    }
+
 }

@@ -59,14 +59,14 @@ require(CHAT_GPT_SEO_PLUGIN_DIR . '/classes/Helpers.php');
 require(CHAT_GPT_SEO_PLUGIN_DIR . '/classes/Audit.php');
 require(CHAT_GPT_SEO_PLUGIN_DIR . '/classes/Init.php');
 require(CHAT_GPT_SEO_PLUGIN_DIR . '/classes/RestRoutes.php');
-require(CHAT_GPT_SEO_PLUGIN_DIR . '/classes/Tests.php');
 require(CHAT_GPT_SEO_PLUGIN_DIR . '/classes/ChatGptApi.php');
+require(CHAT_GPT_SEO_PLUGIN_DIR . '/classes/ChatBot.php');
+require(CHAT_GPT_SEO_PLUGIN_DIR . '/classes/Tests.php');
 
 function seo_audit_init(): void
 {
     $chatGptSeo = new \SeoAudit\Init();
     $chatGptSeo->init();
-    \SeoAudit\Tests::tests();
 }
 
 add_action('init', 'seo_audit_init');

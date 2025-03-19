@@ -1,6 +1,6 @@
 <?php
 
-namespace ChatGptSeo;
+namespace SeoAudit;
 
 class ChatGptSeoApi
 {

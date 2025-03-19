@@ -104,7 +104,6 @@ class Init
                     return current_user_can('edit_others_posts');
                 }
             ));
-
         });
     }
 
@@ -126,7 +125,7 @@ class Init
     }
 
     public function my_custom_rest_api_nonce() {
-        $nonce = wp_create_nonce('my_custom_nonce_action');
+        $nonce = wp_create_nonce('wp_rest');
         wp_localize_script('chat-gpt-seo-js', 'chatGptSeoNonce', ['chatGptSeoNonce' => $nonce ]);
     }
 
@@ -138,10 +137,8 @@ class Init
 
     public function enqueue_plugin_scripts(): void
     {
-
         wp_enqueue_script('chat-gpt-seo-lib-table-js', CHAT_GPT_SEO_PLUGIN_URL . '/assets/lib/jquery.dataTables.js.js', array('jquery'), CHAT_GPT_SEO_VERSION, true);
         wp_enqueue_script('chat-gpt-seo-js', CHAT_GPT_SEO_PLUGIN_URL . '/assets/js/main.js', array('jquery', 'chat-gpt-seo-lib-table-js'), CHAT_GPT_SEO_VERSION, true);
-
     }
 
     public function add_menu_links(): void
@@ -165,8 +162,16 @@ class Init
             [$this, 'keyword_audit']
         );
 
-    }
+        add_submenu_page(
+            'chat-gpt-seo-audit',
+            'Self test',
+            'Self test',
+            'manage_options',
+            'chat-gpt-seo-self-test',
+            [$this, 'self_test']
+        );
 
+    }
 
     public function keyword_audit(): void
     {
@@ -183,6 +188,15 @@ class Init
         ?>
         <div class="wrap">
             <?php include(CHAT_GPT_SEO_PLUGIN_DIR . "/templates/seo.php"); ?>
+        </div>
+        <?php
+    }
+
+    public function self_test(): void
+    {
+        ?>
+        <div class="wrap">
+            <?php include(CHAT_GPT_SEO_PLUGIN_DIR . "/templates/self-test.php"); ?>
         </div>
         <?php
     }

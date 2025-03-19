@@ -1,6 +1,6 @@
 <?php
 
-namespace ChatGptSeo;
+namespace SeoAudit;
 /**
  * ChatBot Class
  */
@@ -116,6 +116,9 @@ class ChatBot
 
         // Parse the API response
         $arrResult = json_decode($response, true);
+        if ($arrResult['error'] ?? false) {
+            return $arrResult['error']['message'];
+        }
         $resultMessage = $arrResult["choices"][0]["message"]["content"];
 
         // Return the response message

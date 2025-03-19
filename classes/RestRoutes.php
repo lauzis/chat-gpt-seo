@@ -69,24 +69,30 @@ class RestRoutes
         $resMessage = $ChatBot->generate_meta_description($content, $keywords,  $force_keyword, $lang);
         if ($resMessage){
             return [
+                'aaaaaa'=>'beeeeeeee',
                 'id' => $id,
                 'content'=>$content,
                 'data'=>$data,
                 'keywords' => $keywords,
                 'response'=>$resMessage['message'],
                 'status'=>'ok',
-                'debug'=>$resMessage['debug']
+                'debug'=>$resMessage['debug'],
+                'resMessage'=>$resMessage,
+                'chatBot'=>json_encode($ChatBot)
             ];
         }
         //$jsonResponse = json_encode(array("responseMessage" => $resMessage));
         return [
+            'ccccccccccccccc'=>'dddddddddddddddddddddddd',
             'id' => $id,
             'content'=>$content,
             'data'=>$data,
             'keywords' => $keywords,
             'response'=>"Pleace check if you have valid ChatGpt token",
             'status'=>'failed',
-            'debug'=>false
+            'debug'=>$resMessage['debug'],
+            'resMessage'=>$resMessage,
+            'chatBot'=>json_encode($ChatBot)
         ];
     }
 

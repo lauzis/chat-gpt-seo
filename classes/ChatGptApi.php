@@ -23,7 +23,7 @@ class ChatGptApi
     private string $instructions_keywords_force;
     private string $instructions_for_run;
 
-    /**
+    /**ChatGptApi
      * ChatGptApi constructor.
      */
     public function __construct()
@@ -48,13 +48,14 @@ class ChatGptApi
         $this->chat_gpt_version = $version ?? "gpt-4";
     }
 
-    public function create_assistant(string $assistant_id, string $instructions): array|bool
+    public function create_assistant(string $assistant_id, string $instructions, string $name = 'Sean'): array|bool
     {
         $data = [
             'instructions' => $instructions,
-            'name' => "Seon",
+            'name' => $name,
             'model' => $this->chat_gpt_version
         ];
+
         $response = self::curl($this->endpoint_create_assistant, $data);
         if ($response) {
             \SeoAudit\Helpers::save_json($assistant_id, $response);
@@ -75,13 +76,13 @@ class ChatGptApi
         }
     }
 
-    private function curl($request_url, array|bool $data = false, $request_type = 'GET'): array|bool
+    private function curl($request_url, array|bool $data = false, $request_type = 'GET'): array|bool|null
     {
         // Set headers for the API request
         $headers = [
             'Content-Type: application/json',
             'Authorization: Bearer ' . $this->authorization,
-            "OpenAI-Beta: assistants=v1"
+            "OpenAI-Beta: assistants=v2"
         ];
 
         // Send the request to the API using cURL
@@ -113,7 +114,7 @@ class ChatGptApi
         return json_decode($response, true);
     }
 
-    private function create_thread(): array|bool
+    public function create_thread(): array|bool
     {
         $data = [];
         $thread = $this->curl($this->endpoint_create_thread, $data, 'POST');
@@ -124,7 +125,7 @@ class ChatGptApi
         return false;
     }
 
-    private function get_thread(): array
+    public function get_thread(): array
     {
         $thread_data = \SeoAudit\Helpers::get_json('thread');
         if ($thread_data) {
@@ -165,6 +166,9 @@ class ChatGptApi
         $debug['rules'] = $rules;
         $debug['consideration'] = $consideration;
         $debug['keywords'] = $keywords;
+        $debug['authorization'] = $this->authorization;
+        $debug['content'] = $content;
+        $debug['forceKeywords'] = $forceKeywords;
 
         if ($assistant) {
             if ($assistant_id) {
@@ -208,11 +212,12 @@ class ChatGptApi
 
                     return ['debug' => $debug, 'message' => $message];
                 }
-                return false;
+                return [ 'debug' => $debug, 'message' => 'No thread id', 'thread_response' => $thread_response];
             }
+            return ['debug' => $debug, 'message' => 'No assistant id', 'assistant' => $assistant];
         }
 
-        return false;
+        return ['debug' => $debug, 'message' => 'No assistant', 'assistant' => $assistant];
     }
 
     private function create_run($thread_id, $assistant_id, $consideration)

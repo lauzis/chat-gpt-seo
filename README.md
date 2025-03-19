@@ -30,8 +30,15 @@
 - Add possibility to list what post types should be analysed
 - Add possibility to add some pages to ignore list
 - Move the default chat gpt context out to the settings page
+- The saving and getting of assistant should be improved, there is something wrong, like we are gettting and 
+setting the assistant by the instructions, but only kind of.
 
 # Change log
+-- version 1.0.15 ---
+- adding options for acf, to edit instructions for chat GPT
+- adding close button/link added to the popup
+- passing locale to chatgpt
+
 -- version 1.0.14 ---
 - adding options for acf, to edit instructions for chat GPT
 - adding close button/link added to the popup

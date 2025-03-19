@@ -111,7 +111,7 @@ function crawlData(passId) {
     force = true;
   }
 
-  var url = "/wp-json/fummailv1/audit-item/" + id;
+  var url = "/wp-json/seo-audit/v1/audit-item/" + id;
   if (force) {
     url = "/wp-json/seo-audit/v1/force-audit-item/" + id;
   }
@@ -265,7 +265,11 @@ function generateMetaDescription(id) {
 
   disableTextField(id);
 
-  httpPost(url, false, formData, function (data) {
+  const header = {
+      'Content-Type': 'application/json',
+      'X-WP-Nonce': chatGptSeoNonce.chatGptSeoNonce,
+  }
+  httpPost(url, header, formData, function (data) {
     var metaDescription = data.response;
     var metaDescriptionField = document.querySelector('#seo-description-' + id);
     metaDescriptionField.value = metaDescription;
